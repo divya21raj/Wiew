@@ -5,19 +5,22 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         playerWrapper: {
-            height: '100%',
-            width: 'auto'
+            position: "relative",
+            paddingTop: "56.25%" 
         },
         reactPlayer: {
-            paddingTop: '56.25%', 
-            position: 'relative',
-        }
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+        }  
     }
 ));
 
 export default function VideoPlayer() {
     
-    const [videoFileURL, setVideoFileURL] = useState("");
+    const [videoFileURL, setVideoFileURL] = useState("https://www.youtube.com/watch?v=ysz5S6PUM-U");
 
     const handleVideoUpload = (e: any) => {
         console.log(e.target.files);
@@ -34,9 +37,6 @@ export default function VideoPlayer() {
 
     const classes = useStyles();
 
-    // const input = document.querySelector('[type=file]')
-    // const url = URL.createObjectURL(input.files[0])
-
     return (
         // Render a YouTube video player
         <div className={classes.playerWrapper} >
@@ -50,7 +50,12 @@ export default function VideoPlayer() {
                     }}
                 />
             </form>
-            <ReactPlayer light playing url={videoFileURL} />   
+            <ReactPlayer 
+                className={classes.reactPlayer}
+                light
+                width='100%'
+                height='100%'
+                playing url={videoFileURL} />   
         </div>
     )
 }

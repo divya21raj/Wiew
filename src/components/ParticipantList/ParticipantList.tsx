@@ -2,7 +2,6 @@ import React from 'react';
 import clsx from 'clsx';
 import Participant from '../Participant/Participant';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import useMainParticipant from '../../hooks/useMainParticipant/useMainParticipant';
 import useParticipants from '../../hooks/useParticipants/useParticipants';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 import useSelectedParticipant from '../VideoProvider/useSelectedParticipant/useSelectedParticipant';
@@ -40,7 +39,7 @@ export default function ParticipantList() {
   const {
     room: { localParticipant },
   } = useVideoContext();
-  const mainParticipant = useMainParticipant();
+  // const mainParticipant = useMainParticipant();
   var participants = useParticipants();
   const [selectedParticipant, setSelectedParticipant] = useSelectedParticipant();
   const screenShareParticipant = useScreenShareParticipant();
@@ -55,9 +54,8 @@ export default function ParticipantList() {
       <div className={classes.scrollContainer}>
         <Participant participant={localParticipant} isLocalParticipant={true} />
         {participants.map(participant => {
-          const isSelected = participant === selectedParticipant;
-          const hideParticipant =
-            participant !== screenShareParticipant && !isSelected;
+          // const isSelected = participant === selectedParticipant;
+          // const hideParticipant = participant !== screenShareParticipant && !isSelected;
           return (
             <Participant
               key={participant.sid}
