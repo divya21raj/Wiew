@@ -12,6 +12,7 @@ import { Typography, Grid, Hidden } from '@material-ui/core';
 import ToggleAudioButton from '../Buttons/ToggleAudioButton/ToggleAudioButton';
 import ToggleVideoButton from '../Buttons/ToggleVideoButton/ToggleVideoButton';
 import ToggleScreenShareButton from '../Buttons/ToogleScreenShareButton/ToggleScreenShareButton';
+import UploadFileButton from '../Buttons/UploadFileButton/UploadFileButton';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -80,7 +81,8 @@ export default function MenuBar() {
       <footer className={classes.container}>
         <Grid container justify="space-around" alignItems="center">
           <Hidden smDown>
-            <Grid style={{ flex: 1 }}>
+            <UploadFileButton />
+            <Grid style={{ flex: 1, padding: "10px" }}>
               <Typography variant="body1">{room.name}</Typography>
             </Grid>
           </Hidden>

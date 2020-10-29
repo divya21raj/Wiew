@@ -6,6 +6,7 @@ import useActiveSinkId from './useActiveSinkId/useActiveSinkId';
 import useFirebaseAuth from './useFirebaseAuth/useFirebaseAuth';
 import usePasscodeAuth from './usePasscodeAuth/usePasscodeAuth';
 import { User } from 'firebase';
+import { initialMedia, Media, MediaAction, mediaReducer } from './media/mediaReducer';
 
 export interface StateContextType {
   error: TwilioError | null;
@@ -20,6 +21,8 @@ export interface StateContextType {
   setActiveSinkId(sinkId: string): void;
   settings: Settings;
   dispatchSetting: React.Dispatch<SettingsAction>;
+  media: Media;
+  dispatchMedia: React.Dispatch<MediaAction>;
   roomType?: RoomType;
 }
 
@@ -39,6 +42,7 @@ export default function AppStateProvider(props: React.PropsWithChildren<{}>) {
   const [isFetching, setIsFetching] = useState(false);
   const [activeSinkId, setActiveSinkId] = useActiveSinkId();
   const [settings, dispatchSetting] = useReducer(settingsReducer, initialSettings);
+  const [media, dispatchMedia] = useReducer(mediaReducer, initialMedia);
 
   let contextValue = {
     error,
@@ -48,6 +52,8 @@ export default function AppStateProvider(props: React.PropsWithChildren<{}>) {
     setActiveSinkId,
     settings,
     dispatchSetting,
+    media,
+    dispatchMedia
   } as StateContextType;
 
   if (process.env.REACT_APP_SET_AUTH === 'firebase') {

@@ -17,14 +17,10 @@ const Container = styled('div')(({ theme }) => ({
 }));
 
 export default function Room() {
-  
-  const { room } = useVideoContext();
-
-  console.log(room.participants)
-  
+    
   return (
     <Container>
-      <VideoPlayer />
+      <VideoPlayer/>
       <ParticipantList />
     </Container>
   );
