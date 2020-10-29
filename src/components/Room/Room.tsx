@@ -2,6 +2,7 @@ import React from 'react';
 import ParticipantList from '../ParticipantList/ParticipantList';
 import { styled } from '@material-ui/core/styles';
 import VideoPlayer from '../VideoPlayer/VideoPlayer';
+import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 
 const Container = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -16,6 +17,11 @@ const Container = styled('div')(({ theme }) => ({
 }));
 
 export default function Room() {
+  
+  const { room } = useVideoContext();
+
+  console.log(room.participants)
+  
   return (
     <Container>
       <VideoPlayer />
