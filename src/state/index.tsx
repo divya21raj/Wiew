@@ -7,6 +7,7 @@ import useFirebaseAuth from './useFirebaseAuth/useFirebaseAuth';
 import usePasscodeAuth from './usePasscodeAuth/usePasscodeAuth';
 import { User } from 'firebase';
 import { initialMedia, Media, MediaAction, mediaReducer } from './media/mediaReducer';
+import { useFirebaseDb } from './useDb/useDb'
 
 export interface StateContextType {
   error: TwilioError | null;
@@ -26,7 +27,14 @@ export interface StateContextType {
   roomType?: RoomType;
 }
 
+export interface DbContextType {
+  db: firebase.firestore.Firestore;
+  setInDb: Promise<void>;
+  getFromDb: Promise<void>;
+}
+
 export const StateContext = createContext<StateContextType>(null!);
+export const DbStateContext = createContext<DbContextType>(null!);
 
 /*
   The 'react-hooks/rules-of-hooks' linting rules prevent React Hooks fron being called
@@ -37,7 +45,7 @@ export const StateContext = createContext<StateContextType>(null!);
   included in the bundle that is produced (due to tree-shaking). Thus, in this instance, it
   is ok to call hooks inside if() statements.
 */
-export default function AppStateProvider(props: React.PropsWithChildren<{}>) {
+export function AppStateProvider(props: React.PropsWithChildren<{}>) {
   const [error, setError] = useState<TwilioError | null>(null);
   const [isFetching, setIsFetching] = useState(false);
   const [activeSinkId, setActiveSinkId] = useActiveSinkId();
@@ -53,7 +61,7 @@ export default function AppStateProvider(props: React.PropsWithChildren<{}>) {
     settings,
     dispatchSetting,
     media,
-    dispatchMedia
+    dispatchMedia,
   } as StateContextType;
 
   if (process.env.REACT_APP_SET_AUTH === 'firebase') {
@@ -97,10 +105,26 @@ export default function AppStateProvider(props: React.PropsWithChildren<{}>) {
   return <StateContext.Provider value={{ ...contextValue, getToken }}>{props.children}</StateContext.Provider>;
 }
 
+export function DbStateProvider(props: React.PropsWithChildren<{}>) {
+  let dbContextValue = {
+    ...useFirebaseDb()    
+  } as DbContextType;
+
+  return <DbStateContext.Provider value={{ ...dbContextValue }}>{props.children}</DbStateContext.Provider>;
+}
+
 export function useAppState() {
   const context = useContext(StateContext);
   if (!context) {
     throw new Error('useAppState must be used within the AppStateProvider');
+  }
+  return context;
+}
+
+export function useDbState() {
+  const context = useContext(DbStateContext);
+  if (!context) {
+    throw new Error('useDbState must be used within the DbStateProvider');
   }
   return context;
 }

@@ -1,6 +1,5 @@
 import React, { useState } from "react"; 
 import ReactPlayer from "react-player";
-import { Player } from 'video-react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { useAppState } from "../../state";
 
@@ -32,9 +31,9 @@ export default function VideoPlayer() {
             <ReactPlayer 
                 className={classes.reactPlayer}
                 light
+                controls
                 width='100%'
-                height='100%'
-                playing 
+                height='100%' 
                 url={media.url}>
             </ReactPlayer>
         </div>
