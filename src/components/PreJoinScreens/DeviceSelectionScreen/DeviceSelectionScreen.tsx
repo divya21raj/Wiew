@@ -5,7 +5,7 @@ import SettingsMenu from './SettingsMenu/SettingsMenu';
 import { Steps } from '../PreJoinScreens';
 import ToggleAudioButton from '../../Buttons/ToggleAudioButton/ToggleAudioButton';
 import ToggleVideoButton from '../../Buttons/ToggleVideoButton/ToggleVideoButton';
-import { useAppState } from '../../../state';
+import { useAppState, useDbState } from '../../../state';
 import useVideoContext from '../../../hooks/useVideoContext/useVideoContext';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -58,12 +58,20 @@ interface DeviceSelectionScreenProps {
 
 export default function DeviceSelectionScreen({ name, roomName, setStep }: DeviceSelectionScreenProps) {
   const classes = useStyles();
-  const { getToken, isFetching } = useAppState();
+  const { getToken, isFetching, media } = useAppState();
+  const { db, useSetInDb } = useDbState();
   const { connect, isAcquiringLocalTracks, isConnecting } = useVideoContext();
   const disableButtons = isFetching || isAcquiringLocalTracks || isConnecting;
 
-  const handleJoin = () => {
+  const HandleJoin = () => {
     getToken(name, roomName).then(token => connect(token));
+    
+    useSetInDb(db, roomName, {...media, name}).then(function() {
+      console.log("Document successfully written!");
+    })
+    .catch(function(error: any) {
+        console.error("Error writing document: ", error);
+    });
   };
 
   return (
@@ -101,7 +109,7 @@ export default function DeviceSelectionScreen({ name, roomName, setStep }: Devic
                 variant="contained"
                 color="primary"
                 data-cy-join-now
-                onClick={handleJoin}
+                onClick={HandleJoin}
                 disabled={disableButtons}
               >
                 Join Now

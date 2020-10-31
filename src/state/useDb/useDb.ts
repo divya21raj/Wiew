@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
-import firebase from "firebase";
+import { useEffect, useState } from 'react';
+import * as firebase from 'firebase/app';
+import 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -9,6 +10,8 @@ const firebaseConfig = {
   messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
   projectId: process.env.REACT_APP_PROJECT_ID
 };
+
+const collection = "rooms";
 
 export function useFirebaseDb() {
   const [db, setDb] = useState<firebase.firestore.Firestore | null>(null);
@@ -20,4 +23,30 @@ export function useFirebaseDb() {
   }, []);
 
   return { db };
+}
+
+/**
+ * Method to set a document in the DB.
+ * @param db instance of the db
+ * @param collection collection name
+ * @param docId id of the doc to set
+ * @param doc body of the doc. Has to the full object, as overwrite will happen
+ */
+export function useSetInDb( db: firebase.firestore.Firestore, docId: string, doc: any) {
+  return db.collection(collection).doc(docId).set(doc);
+}
+
+/**
+ * Method to update a document in the DB.
+ * @param db instance of the db
+ * @param collection collection name
+ * @param docId id of the doc to set
+ * @param doc body of the doc. Can be just a subset of the full object
+ */
+export function useUpdateInDb( db: firebase.firestore.Firestore, docId: string, doc: any) {
+  return db.collection(collection).doc(docId).set(doc, {merge: true});
+}
+
+export function useGetFromDb( db: firebase.firestore.Firestore, docId: string) {
+  return db.collection(collection).doc(docId).get();
 }

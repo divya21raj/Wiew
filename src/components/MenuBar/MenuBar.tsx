@@ -13,6 +13,7 @@ import ToggleAudioButton from '../Buttons/ToggleAudioButton/ToggleAudioButton';
 import ToggleVideoButton from '../Buttons/ToggleVideoButton/ToggleVideoButton';
 import ToggleScreenShareButton from '../Buttons/ToogleScreenShareButton/ToggleScreenShareButton';
 import UploadFileButton from '../Buttons/UploadFileButton/UploadFileButton';
+import { useAppState } from '../../state';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -67,6 +68,7 @@ export default function MenuBar() {
   const classes = useStyles();
   const { isSharingScreen, toggleScreenShare } = useVideoContext();
   const roomState = useRoomState();
+  const { media } = useAppState();
   const isReconnecting = roomState === 'reconnecting';
   const { room } = useVideoContext();
 
@@ -83,7 +85,9 @@ export default function MenuBar() {
           <Hidden smDown>
             <UploadFileButton />
             <Grid style={{ flex: 1, padding: "10px" }}>
-              <Typography variant="body1">{room.name}</Typography>
+              <Typography variant="body1">{
+              media.fileName===""?"No file loaded":media.fileName
+              }</Typography>
             </Grid>
           </Hidden>
           <Grid item>
