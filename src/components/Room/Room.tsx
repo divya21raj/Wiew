@@ -38,7 +38,6 @@ export default function Room() {
           setHasInit(true)
           // someone already in room, match that data
           dispatchRemoteMedia({ name: MULTI, value: {...docToRemoteMedia(doc.data())}});
-          console.log(remoteMedia);
         } else {
             // No one in the room, init it
             setInDb(db, room.name, {...remoteMedia}).then(function() {
@@ -54,7 +53,7 @@ export default function Room() {
       // nothing loaded, prompt user to load something
       setDialogMessage(NoMediaText.NO_FILE);
       setShowDialog(true);
-    } else if(localMedia.fileName != remoteMedia.fileName) {
+    } else if(localMedia.fileName !== remoteMedia.fileName) {
       // fileName mismatch, prompt to load new file
       setDialogMessage(NoMediaText.NO_MATCH);
       setShowDialog(true);

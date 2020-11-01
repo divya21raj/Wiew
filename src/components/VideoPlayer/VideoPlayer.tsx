@@ -1,7 +1,9 @@
-import React, { useState } from "react"; 
+import React, { useEffect, useRef, useState } from "react"; 
 import ReactPlayer from "react-player";
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { useAppState } from "../../state";
+import { useAppState, useDbState } from "../../state";
+import useVideoContext from "../../hooks/useVideoContext/useVideoContext";
+import { MULTI } from "../../state/media/media";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -21,32 +23,42 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function VideoPlayer() {
     
-    const { localMedia, dispatchLocalMedia } = useAppState();
+    const { localMedia, remoteMedia, dispatchLocalMedia, dispatchRemoteMedia } = useAppState();
+    const { db, updateInDb } = useDbState();
+    const { room } = useVideoContext();
     
     const classes = useStyles();
 
+    const player = useRef<any>(null);
+
+    useEffect(() => {
+        updateInDb(db, room.name, {"playing": remoteMedia.playing})
+    }, [remoteMedia.playing])
+
+    useEffect(() => {
+        updateInDb(db, room.name, {"timestamp": remoteMedia.timestamp})
+    }, [remoteMedia.timestamp])
+
+    const handlePlayToggle = (playing: boolean) => {
+        dispatchLocalMedia({ name: MULTI, value: {"playing": playing, "timestamp": player.current.getCurrentTime()} });
+        dispatchRemoteMedia({ name: MULTI, value: {"playing": playing, "timestamp": player.current.getCurrentTime() + 1} });
+    }
+
     const handlePlay = () => {
         console.log('onPlay')
-        dispatchLocalMedia({ name: "isPaused", value: false });
-        // this.setState({ playing: true })
+        handlePlayToggle(true);
     }
 
     const handlePause = () => {
         console.log('onPause')
-        // this.setState({ playing: false })
+        handlePlayToggle(false);
     }
 
     const handleSeekChange = (e: any) => {
         // this.setState({ played: parseFloat(e.target.value) })
         console.log('onSeek', e);
-    }
-
-    const handleProgress = (state: any) => {
-        console.log('onProgress', state)
-        // We only want to update time slider if we are not currently seeking
-        // if (!this.state.seeking) {
-        // this.setState(state)
-        // }
+        dispatchLocalMedia({name: "timestamp", value: e});
+        dispatchRemoteMedia({name: "timestamp", value: e + 1});
     }
 
     const handleEnded = () => {
@@ -63,6 +75,7 @@ export default function VideoPlayer() {
         <div className={classes.playerWrapper} >
             <ReactPlayer 
                 className={classes.reactPlayer}
+                ref={player}
                 light
                 controls
                 width='100%'
@@ -77,7 +90,7 @@ export default function VideoPlayer() {
                 onSeek={handleSeekChange}
                 onEnded={handleEnded}
                 onError={e => console.log('onError', e)}
-                onProgress={handleProgress}
+                // onProgress={handleProgress}
                 onDuration={handleDuration}>
             </ReactPlayer>
         </div>

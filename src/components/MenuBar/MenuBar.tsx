@@ -70,7 +70,6 @@ export default function MenuBar() {
   const roomState = useRoomState();
   const { remoteMedia } = useAppState();
   const isReconnecting = roomState === 'reconnecting';
-  const { room } = useVideoContext();
 
   return (
     <>
