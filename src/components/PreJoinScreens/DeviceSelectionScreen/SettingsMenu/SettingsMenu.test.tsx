@@ -1,5 +1,5 @@
 import React from 'react';
-import AboutDialog from '../../../AboutDialog/AboutDialog';
+import AboutDialog from '../../../Dialogs/AboutDialog/AboutDialog';
 import { Button, MenuItem } from '@material-ui/core';
 import ConnectionOptionsDialog from '../../../ConnectionOptionsDialog/ConnectionOptionsDialog';
 import DeviceSelectionDialog from '../../../DeviceSelectionDialog/DeviceSelectionDialog';

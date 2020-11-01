@@ -1,7 +1,7 @@
 import React from 'react';
 import AboutDialog from './AboutDialog';
 import { render } from '@testing-library/react';
-import { useAppState } from '../../state';
+import { useAppState } from '../../../state';
 
 jest.mock('twilio-video', () => ({ version: '1.2', isSupported: true }));
 jest.mock('../../../package.json', () => ({ version: '1.3' }));

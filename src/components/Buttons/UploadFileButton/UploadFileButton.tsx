@@ -9,7 +9,7 @@ import { MULTI } from '../../../state/media/media';
 //https://masakudamatsu.medium.com/how-to-customize-the-file-upload-button-in-react-b3866a5973d8
 
 export default function UploadFileButton(props: { className?: string }) {
-  const { remoteMedia, dispatchRemoteMedia } = useAppState();
+  const { remoteMedia, localMedia, dispatchRemoteMedia, dispatchLocalMedia } = useAppState();
   const { db, updateInDb } = useDbState();
   const { room } = useVideoContext();
 
@@ -20,13 +20,20 @@ export default function UploadFileButton(props: { className?: string }) {
   };
 
   useEffect(() => {
-    if(remoteMedia.url){
+    if(localMedia.url){
+      console.log(localMedia);
       console.log(remoteMedia);
-      updateInDb(db, room.name, {...remoteMedia})
-      .then(() => {console.log("Successful")})
-      .catch((error: any) => {console.log(error)});
+      if(!remoteMedia.fileName || localMedia.fileName === remoteMedia.fileName) {
+        updateInDb(db, room.name, {...localMedia})
+        .then(() => {
+          dispatchRemoteMedia({name: MULTI, value: {...localMedia}})
+          console.log("Successful upload of local to remote")
+        })
+        .catch((error: any) => {console.log(error)});
+      }
+      else if(remoteMedia.fileName) {console.error("Files don't match!")}
     }
-  }, [remoteMedia]);
+  }, [localMedia]);
 
   const handleChange = useCallback(
     (e: any) => {
@@ -34,9 +41,13 @@ export default function UploadFileButton(props: { className?: string }) {
       let files = e.target.files;
       let file = files[0];
       const urlString = URL.createObjectURL(file);
-      dispatchRemoteMedia({ name: MULTI, value: {"url": urlString, "fileName": file.name}});
+
+      if(remoteMedia.fileName && remoteMedia.fileName != file.name) 
+        console.error("Files don't match!")
+      else
+        dispatchLocalMedia({ name: MULTI, value: {"url": urlString, "fileName": file.name}});
     },
-    [dispatchRemoteMedia]
+    [dispatchLocalMedia]
   );
     
   return (

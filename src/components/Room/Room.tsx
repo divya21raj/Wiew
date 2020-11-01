@@ -6,6 +6,7 @@ import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 import { useAppState, useDbState } from '../../state';
 import { MULTI } from '../../state/media/media';
 import { docToRemoteMedia } from '../../state/media/media';
+import NoMediaDialog, { NoMediaText } from '../Dialogs/NoMediaDialog';
 
 const Container = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -21,8 +22,11 @@ const Container = styled('div')(({ theme }) => ({
 
 export default function Room() {
   const [hasInit, setHasInit] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+  const [dialogMessage, setDialogMessage] = useState(NoMediaText.NO_FILE);
+
   const { db, setInDb, getFromDb } = useDbState();
-  const { remoteMedia, user, dispatchRemoteMedia } = useAppState();
+  const { localMedia, remoteMedia, user, dispatchRemoteMedia } = useAppState();
   const { room } = useVideoContext();
 
   useEffect(() => {
@@ -33,14 +37,11 @@ export default function Room() {
         if (doc.exists) {
           setHasInit(true)
           // someone already in room, match that data
-          console.log("Existing Document data:", doc.data());
           dispatchRemoteMedia({ name: MULTI, value: {...docToRemoteMedia(doc.data())}});
           console.log(remoteMedia);
         } else {
             // No one in the room, init it
-            console.log("No such document!");
             setInDb(db, room.name, {...remoteMedia}).then(function() {
-              console.log("Document successfully written!");
               setHasInit(true)
             })
             .catch((error: any) => console.error("Error writing document: ", error));  
@@ -48,12 +49,23 @@ export default function Room() {
       })
       .catch((error: any) => console.error("Error writing document: ", error));
     }
+
+    if(!(localMedia.fileName && remoteMedia.fileName)) {
+      // nothing loaded, prompt user to load something
+      setDialogMessage(NoMediaText.NO_FILE);
+      setShowDialog(true);
+    } else if(localMedia.fileName != remoteMedia.fileName) {
+      // fileName mismatch, prompt to load new file
+      setDialogMessage(NoMediaText.NO_MATCH);
+      setShowDialog(true);
+    } else setShowDialog(false);
   })
     
   return (
     <Container>
       <VideoPlayer/>
       <ParticipantList />
+      { showDialog && <NoMediaDialog text={dialogMessage}/> }
     </Container>
   );
 }

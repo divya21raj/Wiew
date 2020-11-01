@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import AboutDialog from '../../AboutDialog/AboutDialog';
+import AboutDialog from '../../Dialogs/AboutDialog/AboutDialog';
 import Button from '@material-ui/core/Button';
 import DeviceSelectionDialog from '../../DeviceSelectionDialog/DeviceSelectionDialog';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';

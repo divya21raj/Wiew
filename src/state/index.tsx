@@ -67,6 +67,8 @@ export function AppStateProvider(props: React.PropsWithChildren<{}>) {
     dispatchSetting,
     remoteMedia,
     dispatchRemoteMedia,
+    localMedia,
+    dispatchLocalMedia,
   } as StateContextType;
 
   if (process.env.REACT_APP_SET_AUTH === 'firebase') {
