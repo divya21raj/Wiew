@@ -4,12 +4,12 @@ import { Button } from '@material-ui/core';
 
 import { useAppState, useDbState } from '../../../state';
 import useVideoContext from '../../../hooks/useVideoContext/useVideoContext';
-import { MULTI } from '../../../state/media/mediaReducer';
+import { MULTI } from '../../../state/media/media';
 
 //https://masakudamatsu.medium.com/how-to-customize-the-file-upload-button-in-react-b3866a5973d8
 
 export default function UploadFileButton(props: { className?: string }) {
-  const { media, dispatchMedia } = useAppState();
+  const { remoteMedia, dispatchRemoteMedia } = useAppState();
   const { db, updateInDb } = useDbState();
   const { room } = useVideoContext();
 
@@ -19,16 +19,14 @@ export default function UploadFileButton(props: { className?: string }) {
     hiddenFileInput.current.click();
   };
 
-  const DbUpdate = () => {
-    updateInDb(db, room.name, {...media})
-    .then(() => {console.log("Successful")})
-    .catch((error: any) => {console.log(error)});
-  }
-
   useEffect(() => {
-    console.log(media);
-    DbUpdate();
-  }, [media]);
+    if(remoteMedia.url){
+      console.log(remoteMedia);
+      updateInDb(db, room.name, {...remoteMedia})
+      .then(() => {console.log("Successful")})
+      .catch((error: any) => {console.log(error)});
+    }
+  }, [remoteMedia]);
 
   const handleChange = useCallback(
     (e: any) => {
@@ -36,9 +34,9 @@ export default function UploadFileButton(props: { className?: string }) {
       let files = e.target.files;
       let file = files[0];
       const urlString = URL.createObjectURL(file);
-      dispatchMedia({ name: MULTI, value: {"url": urlString, "fileName": file.name}});
+      dispatchRemoteMedia({ name: MULTI, value: {"url": urlString, "fileName": file.name}});
     },
-    [dispatchMedia]
+    [dispatchRemoteMedia]
   );
     
   return (

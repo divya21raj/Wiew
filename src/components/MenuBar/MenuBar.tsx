@@ -68,7 +68,7 @@ export default function MenuBar() {
   const classes = useStyles();
   const { isSharingScreen, toggleScreenShare } = useVideoContext();
   const roomState = useRoomState();
-  const { media } = useAppState();
+  const { remoteMedia } = useAppState();
   const isReconnecting = roomState === 'reconnecting';
   const { room } = useVideoContext();
 
@@ -86,7 +86,7 @@ export default function MenuBar() {
             <UploadFileButton />
             <Grid style={{ flex: 1, padding: "10px" }}>
               <Typography variant="body1">{
-              media.fileName===""?"No file loaded":media.fileName
+                remoteMedia.fileName===""?"No file loaded":remoteMedia.fileName
               }</Typography>
             </Grid>
           </Hidden>

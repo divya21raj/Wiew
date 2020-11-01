@@ -21,13 +21,13 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function VideoPlayer() {
     
-    const { media, dispatchMedia } = useAppState();
+    const { localMedia, dispatchLocalMedia } = useAppState();
     
     const classes = useStyles();
 
     const handlePlay = () => {
         console.log('onPlay')
-        dispatchMedia({ name: "isPaused", value: false });
+        dispatchLocalMedia({ name: "isPaused", value: false });
         // this.setState({ playing: true })
     }
 
@@ -67,8 +67,8 @@ export default function VideoPlayer() {
                 controls
                 width='100%'
                 height='100%'
-                playing={media.playing} 
-                url={media.url}
+                playing={localMedia.playing} 
+                url={localMedia.url}
                 onReady={() => console.log('onReady')}
                 onStart={() => console.log('onStart')}
                 onPlay={handlePlay}
