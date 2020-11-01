@@ -32,7 +32,7 @@ export function useFirebaseDb() {
  * @param docId id of the doc to set
  * @param doc body of the doc. Has to the full object, as overwrite will happen
  */
-export function useSetInDb( db: firebase.firestore.Firestore, docId: string, doc: any) {
+export function setInDb( db: firebase.firestore.Firestore, docId: string, doc: any) {
   return db.collection(collection).doc(docId).set(doc);
 }
 
@@ -43,10 +43,10 @@ export function useSetInDb( db: firebase.firestore.Firestore, docId: string, doc
  * @param docId id of the doc to set
  * @param doc body of the doc. Can be just a subset of the full object
  */
-export function useUpdateInDb( db: firebase.firestore.Firestore, docId: string, doc: any) {
+export function updateInDb( db: firebase.firestore.Firestore, docId: string, doc: any) {
   return db.collection(collection).doc(docId).set(doc, {merge: true});
 }
 
-export function useGetFromDb( db: firebase.firestore.Firestore, docId: string) {
+export function getFromDb( db: firebase.firestore.Firestore, docId: string) {
   return db.collection(collection).doc(docId).get();
 }

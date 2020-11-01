@@ -7,7 +7,7 @@ import useFirebaseAuth from './useFirebaseAuth/useFirebaseAuth';
 import usePasscodeAuth from './usePasscodeAuth/usePasscodeAuth';
 import { User } from 'firebase';
 import { initialMedia, Media, MediaAction, mediaReducer } from './media/mediaReducer';
-import { useFirebaseDb, useSetInDb, useGetFromDb, useUpdateInDb } from './useDb/useDb'
+import { useFirebaseDb, setInDb, getFromDb, updateInDb } from './useDb/useDb'
 
 export interface StateContextType {
   error: TwilioError | null;
@@ -29,9 +29,9 @@ export interface StateContextType {
 
 export interface DbContextType {
   db: firebase.firestore.Firestore;
-  useSetInDb: any;
-  useUpdateInDb: any;
-  useGetFromDb: any;
+  setInDb: any;
+  updateInDb: any;
+  getFromDb: any;
 }
 
 export const StateContext = createContext<StateContextType>(null!);
@@ -109,9 +109,9 @@ export function AppStateProvider(props: React.PropsWithChildren<{}>) {
 export function DbStateProvider(props: React.PropsWithChildren<{}>) {
   let dbContextValue = {
     ...useFirebaseDb(),  
-    useSetInDb,
-    useUpdateInDb,
-    useGetFromDb  
+    setInDb: setInDb,
+    updateInDb: updateInDb,
+    getFromDb: getFromDb  
   } as DbContextType;
 
   return <DbStateContext.Provider value={{ ...dbContextValue }}>{props.children}</DbStateContext.Provider>;

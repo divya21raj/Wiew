@@ -10,7 +10,7 @@ import { MULTI } from '../../../state/media/mediaReducer';
 
 export default function UploadFileButton(props: { className?: string }) {
   const { media, dispatchMedia } = useAppState();
-  const { db, useUpdateInDb } = useDbState();
+  const { db, updateInDb } = useDbState();
   const { room } = useVideoContext();
 
   const hiddenFileInput = React.useRef(document.createElement("input"));
@@ -20,7 +20,7 @@ export default function UploadFileButton(props: { className?: string }) {
   };
 
   const DbUpdate = () => {
-    useUpdateInDb(db, room.name, {...media})
+    updateInDb(db, room.name, {...media})
     .then(() => {console.log("Successful")})
     .catch((error: any) => {console.log(error)});
   }

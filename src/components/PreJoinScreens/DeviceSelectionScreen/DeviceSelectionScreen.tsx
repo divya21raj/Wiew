@@ -59,14 +59,14 @@ interface DeviceSelectionScreenProps {
 export default function DeviceSelectionScreen({ name, roomName, setStep }: DeviceSelectionScreenProps) {
   const classes = useStyles();
   const { getToken, isFetching, media } = useAppState();
-  const { db, useSetInDb } = useDbState();
+  const { db, setInDb } = useDbState();
   const { connect, isAcquiringLocalTracks, isConnecting } = useVideoContext();
   const disableButtons = isFetching || isAcquiringLocalTracks || isConnecting;
 
   const HandleJoin = () => {
     getToken(name, roomName).then(token => connect(token));
     
-    useSetInDb(db, roomName, {...media, name}).then(function() {
+    setInDb(db, roomName, {...media, name}).then(function() {
       console.log("Document successfully written!");
     })
     .catch(function(error: any) {

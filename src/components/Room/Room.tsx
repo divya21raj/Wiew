@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ParticipantList from '../ParticipantList/ParticipantList';
 import { styled } from '@material-ui/core/styles';
 import VideoPlayer from '../VideoPlayer/VideoPlayer';
@@ -17,6 +17,10 @@ const Container = styled('div')(({ theme }) => ({
 }));
 
 export default function Room() {
+
+  useEffect(() => {
+    console.log("Room effect")
+  })
     
   return (
     <Container>

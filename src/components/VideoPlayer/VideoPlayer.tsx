@@ -21,20 +21,64 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function VideoPlayer() {
     
-    const { media } = useAppState();
+    const { media, dispatchMedia } = useAppState();
     
     const classes = useStyles();
 
+    const handlePlay = () => {
+        console.log('onPlay')
+        dispatchMedia({ name: "isPaused", value: false });
+        // this.setState({ playing: true })
+    }
+
+    const handlePause = () => {
+        console.log('onPause')
+        // this.setState({ playing: false })
+    }
+
+    const handleSeekChange = (e: any) => {
+        // this.setState({ played: parseFloat(e.target.value) })
+        console.log('onSeek', e);
+    }
+
+    const handleProgress = (state: any) => {
+        console.log('onProgress', state)
+        // We only want to update time slider if we are not currently seeking
+        // if (!this.state.seeking) {
+        // this.setState(state)
+        // }
+    }
+
+    const handleEnded = () => {
+        console.log('onEnded')
+        // this.setState({ playing: this.state.loop })
+    }
+
+    const handleDuration = (duration: any) => {
+        console.log('onDuration', duration)
+        // this.setState({ duration })
+    }
+
     return (
-        // Render a YouTube video player
         <div className={classes.playerWrapper} >
             <ReactPlayer 
                 className={classes.reactPlayer}
                 light
                 controls
                 width='100%'
-                height='100%' 
-                url={media.url}>
+                height='100%'
+                playing={media.playing} 
+                url={media.url}
+                onReady={() => console.log('onReady')}
+                onStart={() => console.log('onStart')}
+                onPlay={handlePlay}
+                onPause={handlePause}
+                onBuffer={() => console.log('onBuffer')}
+                onSeek={handleSeekChange}
+                onEnded={handleEnded}
+                onError={e => console.log('onError', e)}
+                onProgress={handleProgress}
+                onDuration={handleDuration}>
             </ReactPlayer>
         </div>
     )

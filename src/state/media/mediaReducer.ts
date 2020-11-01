@@ -8,8 +8,8 @@ export const MULTI = "SET_MULTIPLE";
 export interface Media {
   url: string;
   source: MediaSource;
-  isPaused: boolean;
-  timestamp: string;
+  playing: boolean;
+  timestamp: number;
   fileName: string
 }
 
@@ -21,8 +21,8 @@ export interface MediaAction {
 export const initialMedia: Media = {
   url: "",
   source: MediaSource.LOCAL,
-  isPaused: false,
-  timestamp: "",
+  playing: false,
+  timestamp: 0,
   fileName: ""
 };
 
