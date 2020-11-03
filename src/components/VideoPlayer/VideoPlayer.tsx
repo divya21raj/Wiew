@@ -26,6 +26,10 @@ export default function VideoPlayer() {
     const { localMedia, remoteMedia, dispatchLocalMedia, dispatchRemoteMedia } = useAppState();
     const { db, updateInDb } = useDbState();
     const { room } = useVideoContext();
+
+    const [seeking, setSeeking] = useState(false);
+    const [ready, setReady] = useState(false);
+    const [playedSeconds, setPlayedSeconds] = useState(0);
     
     const classes = useStyles();
 
@@ -39,36 +43,60 @@ export default function VideoPlayer() {
         updateInDb(db, room.name, {"timestamp": remoteMedia.timestamp})
     }, [remoteMedia.timestamp])
 
-    const handlePlayToggle = (playing: boolean) => {
-        dispatchLocalMedia({ name: MULTI, value: {"playing": playing, "timestamp": player.current.getCurrentTime()} });
-        dispatchRemoteMedia({ name: MULTI, value: {"playing": playing, "timestamp": player.current.getCurrentTime() + 1} });
+    useEffect(() => {
+        if(true) {
+            console.log("Seeking due to update");
+            player.current.seekTo(localMedia.timestamp);
+        }
+        setSeeking(false);
+        
+    }, [localMedia.timestamp])
+
+    const handlePlayToggle = (playing: boolean, timestamp: number) => {
+        console.log("Is Ready to playtoggle? " + ready);
+        if(ready) {
+            console.log("Upload in playToggle");
+            dispatchLocalMedia({ name: MULTI, value: {"playing": playing, "timestamp": timestamp} });
+            dispatchRemoteMedia({ name: MULTI, value: {"playing": playing, "timestamp": timestamp} });
+        }
     }
 
     const handlePlay = () => {
         console.log('onPlay')
-        handlePlayToggle(true);
+        handlePlayToggle(true, player.current.getCurrentTime());
     }
 
     const handlePause = () => {
         console.log('onPause')
-        handlePlayToggle(false);
+        console.log(playedSeconds-player.current.getCurrentTime())
+        if(Math.abs(playedSeconds-player.current.getCurrentTime()) < 1)
+            handlePlayToggle(false, player.current.getCurrentTime());
     }
 
     const handleSeekChange = (e: any) => {
-        // this.setState({ played: parseFloat(e.target.value) })
-        console.log('onSeek', e);
-        dispatchLocalMedia({name: "timestamp", value: e});
-        dispatchRemoteMedia({name: "timestamp", value: e + 1});
+        console.log('onSeekManually', e);
+        setSeeking(true);
+    }
+
+    const handleOnReady = () => {
+        console.log('onReady')
+        setReady(true);
+        if(seeking) {
+            dispatchRemoteMedia({name: "timestamp", value: player.current.getCurrentTime()});
+            console.log("Upload");
+        }
+    }
+
+    const handleProgress = (state: any) => {
+        setPlayedSeconds(state.playedSeconds);
     }
 
     const handleEnded = () => {
         console.log('onEnded')
-        // this.setState({ playing: this.state.loop })
     }
 
     const handleDuration = (duration: any) => {
         console.log('onDuration', duration)
-        // this.setState({ duration })
     }
 
     return (
@@ -76,21 +104,23 @@ export default function VideoPlayer() {
             <ReactPlayer 
                 className={classes.reactPlayer}
                 ref={player}
-                light
                 controls
                 width='100%'
                 height='100%'
                 playing={localMedia.playing} 
                 url={localMedia.url}
-                onReady={() => console.log('onReady')}
+                onReady={handleOnReady}
                 onStart={() => console.log('onStart')}
                 onPlay={handlePlay}
                 onPause={handlePause}
-                onBuffer={() => console.log('onBuffer')}
+                onBuffer={() => {
+                    console.log('onBuffer')
+                    setReady(false);
+                }}
                 onSeek={handleSeekChange}
                 onEnded={handleEnded}
                 onError={e => console.log('onError', e)}
-                // onProgress={handleProgress}
+                onProgress={handleProgress}
                 onDuration={handleDuration}>
             </ReactPlayer>
         </div>

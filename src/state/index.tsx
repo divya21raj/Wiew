@@ -7,7 +7,7 @@ import useFirebaseAuth from './useFirebaseAuth/useFirebaseAuth';
 import usePasscodeAuth from './usePasscodeAuth/usePasscodeAuth';
 import { User } from 'firebase';
 import { initialLocalMedia, initialRemoteMedia, localMediaReducer, MediaAction, remoteMediaReducer } from './media/mediaReducers';
-import { useFirebaseDb, setInDb, getFromDb, updateInDb } from './useDb/useDb'
+import { useFirebaseDb, setInDb, getFromDb, updateInDb, listenInDb } from './useDb/useDb'
 import { Media } from './media/media';
 
 export interface StateContextType {
@@ -35,6 +35,7 @@ export interface DbContextType {
   setInDb: any;
   updateInDb: any;
   getFromDb: any;
+  listenInDb: any;
 }
 
 export const StateContext = createContext<StateContextType>(null!);
@@ -117,7 +118,8 @@ export function DbStateProvider(props: React.PropsWithChildren<{}>) {
     ...useFirebaseDb(),  
     setInDb: setInDb,
     updateInDb: updateInDb,
-    getFromDb: getFromDb  
+    getFromDb: getFromDb,
+    listenInDb: listenInDb
   } as DbContextType;
 
   return <DbStateContext.Provider value={{ ...dbContextValue }}>{props.children}</DbStateContext.Provider>;

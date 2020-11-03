@@ -31,9 +31,11 @@ export default function UploadFileButton(props: { className?: string }) {
         })
         .catch((error: any) => {console.log(error)});
       }
-      else if(remoteMedia.fileName) {console.error("Files don't match!")}
+      else if(remoteMedia.fileName) {
+        console.error("Files don't match!")
+      }
     }
-  }, [localMedia]);
+  }, [localMedia.url]);
 
   const handleChange = useCallback(
     (e: any) => {
@@ -44,8 +46,7 @@ export default function UploadFileButton(props: { className?: string }) {
 
       if(remoteMedia.fileName && remoteMedia.fileName !== file.name) 
         console.error("Files don't match!")
-      else
-        dispatchLocalMedia({ name: MULTI, value: {"url": urlString, "fileName": file.name}});
+      dispatchLocalMedia({ name: MULTI, value: {"url": urlString, "fileName": file.name}});
     },
     [dispatchLocalMedia]
   );

@@ -47,6 +47,14 @@ export function updateInDb( db: firebase.firestore.Firestore, docId: string, doc
   return db.collection(collection).doc(docId).set(doc, {merge: true});
 }
 
-export function getFromDb( db: firebase.firestore.Firestore, docId: string) {
+export function getFromDb( db: firebase.firestore.Firestore, docId: string ) {
   return db.collection(collection).doc(docId).get();
+}
+
+export function listenInDb( db: firebase.firestore.Firestore, docId: string, action: (doc:any) => void ) {
+  db.collection(collection).doc(docId)
+    .onSnapshot(function(doc) {
+        console.log("Current data: ", doc.data());
+        action(doc);
+    });
 }
