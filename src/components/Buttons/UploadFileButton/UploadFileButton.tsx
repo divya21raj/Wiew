@@ -42,10 +42,12 @@ export default function UploadFileButton(props: { className?: string }) {
       console.log(e.target.files);
       let files = e.target.files;
       let file = files[0];
-      const urlString = URL.createObjectURL(file);
+      let urlString = URL.createObjectURL(file);
 
-      if(remoteMedia.fileName && remoteMedia.fileName !== file.name) 
+      if(remoteMedia.fileName && remoteMedia.fileName !== file.name) {
         console.error("Files don't match!")
+        urlString = "";
+      }
       dispatchLocalMedia({ name: MULTI, value: {"url": urlString, "fileName": file.name}});
     },
     [dispatchLocalMedia]

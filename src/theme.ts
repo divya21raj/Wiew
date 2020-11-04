@@ -112,7 +112,7 @@ export default createMuiTheme({
   brand: '#E22525',
   footerHeight: 55,
   mobileFooterHeight: 35,
-  sidebarWidth: 335,
+  sidebarWidth: 300,
   sidebarMobileHeight: 90,
   mobileTopBarHeight: 35,
 });

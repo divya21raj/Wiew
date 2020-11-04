@@ -10,7 +10,7 @@ import useScreenShareParticipant from '../../hooks/useScreenShareParticipant/use
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     container: {
-      padding: '2em',
+      padding: '1em',
       overflowY: 'auto',
       background: 'rgb(79, 83, 85)',
       gridArea: '1 / 2 / 1 / 3',
@@ -39,7 +39,6 @@ export default function ParticipantList() {
   const {
     room: { localParticipant },
   } = useVideoContext();
-  // const mainParticipant = useMainParticipant();
   var participants = useParticipants();
   const [selectedParticipant, setSelectedParticipant] = useSelectedParticipant();
   const screenShareParticipant = useScreenShareParticipant();
@@ -54,8 +53,6 @@ export default function ParticipantList() {
       <div className={classes.scrollContainer}>
         <Participant participant={localParticipant} isLocalParticipant={true} />
         {participants.map(participant => {
-          // const isSelected = participant === selectedParticipant;
-          // const hideParticipant = participant !== screenShareParticipant && !isSelected;
           return (
             <Participant
               key={participant.sid}

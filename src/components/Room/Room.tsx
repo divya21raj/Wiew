@@ -5,7 +5,7 @@ import VideoPlayer from '../VideoPlayer/VideoPlayer';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 import { useAppState, useDbState } from '../../state';
 import { MULTI } from '../../state/media/media';
-import { docToRemoteMedia } from '../../state/media/media';
+import { docToMedia } from '../../state/media/media';
 import NoMediaDialog, { NoMediaText } from '../Dialogs/NoMediaDialog';
 
 const Container = styled('div')(({ theme }) => ({
@@ -39,16 +39,19 @@ export default function Room() {
       .onSnapshot(function(doc) {
           console.log("Current data: ", doc.data());
           dispatchLocalMedia({ name: MULTI, value: {"playing": doc.data()!.playing, "timestamp": doc.data()!.timestamp} });
+
+          if(!doc.data()!.url) // data reset, reset the remote media too
+            dispatchRemoteMedia({ name: MULTI, value: {...docToMedia(doc.data())}});
       });
 
       getFromDb(db, room.name)
       .then((doc: any) => {
         if (doc.exists) {
           // someone already in room, match that data
-          dispatchRemoteMedia({ name: MULTI, value: {...docToRemoteMedia(doc.data())}});
+          dispatchRemoteMedia({ name: MULTI, value: {...docToMedia(doc.data())}});
         } else {
             // No one in the room, init it
-            setInDb(db, room.name, {...remoteMedia}).then(function() {
+              setInDb(db, room.name, {...remoteMedia}).then(function() {
               console.log("inited empty room")
             })
             .catch((error: any) => {
@@ -63,6 +66,9 @@ export default function Room() {
       });
     }
 
+    console.log(localMedia);
+    console.log(remoteMedia);
+
     if(!(localMedia.fileName && remoteMedia.fileName)) {
       // nothing loaded, prompt user to load something
       setDialogMessage(NoMediaText.NO_FILE);
@@ -72,7 +78,7 @@ export default function Room() {
       setDialogMessage(NoMediaText.NO_MATCH);
       setShowDialog(true);
     } else setShowDialog(false);
-  }, [remoteMedia]);
+  }, [remoteMedia, localMedia.fileName]);
     
   return (
     <Container>

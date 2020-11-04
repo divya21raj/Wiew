@@ -43,13 +43,9 @@ export default function VideoPlayer() {
         updateInDb(db, room.name, {"timestamp": remoteMedia.timestamp})
     }, [remoteMedia.timestamp])
 
-    useEffect(() => {
-        if(true) {
-            console.log("Seeking due to update");
-            player.current.seekTo(localMedia.timestamp);
-        }
-        setSeeking(false);
-        
+    useEffect(() => {        
+        console.log("Seeking due to update");
+        player.current.seekTo(localMedia.timestamp);
     }, [localMedia.timestamp])
 
     const handlePlayToggle = (playing: boolean, timestamp: number) => {

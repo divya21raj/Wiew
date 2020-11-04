@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
 import Button from '@material-ui/core/Button';
@@ -14,6 +14,7 @@ import ToggleVideoButton from '../Buttons/ToggleVideoButton/ToggleVideoButton';
 import ToggleScreenShareButton from '../Buttons/ToogleScreenShareButton/ToggleScreenShareButton';
 import UploadFileButton from '../Buttons/UploadFileButton/UploadFileButton';
 import { useAppState } from '../../state';
+import ResetMediaButton from '../Buttons/ResetMediaButton/ResetMediaButton';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -71,6 +72,12 @@ export default function MenuBar() {
   const { remoteMedia } = useAppState();
   const isReconnecting = roomState === 'reconnecting';
 
+  const [fileName, setFileName] = useState(remoteMedia.fileName);
+
+  useEffect(() => {
+    setFileName(remoteMedia.fileName);
+  }, [remoteMedia.fileName]);
+
   return (
     <>
       {isSharingScreen && (
@@ -83,9 +90,10 @@ export default function MenuBar() {
         <Grid container justify="space-around" alignItems="center">
           <Hidden smDown>
             <UploadFileButton />
+            <ResetMediaButton />
             <Grid style={{ flex: 1, padding: "10px" }}>
               <Typography variant="body1">{
-                remoteMedia.fileName===""?"No file loaded":remoteMedia.fileName
+                fileName===""?"No file loaded":fileName
               }</Typography>
             </Grid>
           </Hidden>

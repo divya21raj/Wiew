@@ -13,7 +13,7 @@ export interface Media{
     timestamp: number;
 }
 
-export const docToRemoteMedia = (doc: any) => {
+export const docToMedia = (doc: any) => {
     console.log(doc)
     const media: Media = {
         url: doc.url,
