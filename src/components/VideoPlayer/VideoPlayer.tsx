@@ -120,5 +120,5 @@ export default function VideoPlayer() {
                 onDuration={handleDuration}>
             </ReactPlayer>
         </div>
-    )
+    );
 }
