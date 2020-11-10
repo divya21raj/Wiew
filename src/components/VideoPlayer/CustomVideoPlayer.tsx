@@ -1,48 +1,50 @@
-import React, { useState, useRef, useEffect } from "react";
-import Container from "@material-ui/core/Container";
-import ReactPlayer from "react-player";
-import { makeStyles } from "@material-ui/core/styles";
+import React, { useState, useRef, useEffect } from 'react';
+import Container from '@material-ui/core/Container';
+import ReactPlayer from 'react-player';
+import { makeStyles } from '@material-ui/core/styles';
 
-import screenful, {Screenfull} from "screenfull";
-import Controls from "./Controls";
+import screenful, { Screenfull } from 'screenfull';
+import Controls from './Controls';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   playerWrapper: {
-    width: "100%",
+    position: 'relative',
+    paddingTop: '56.25%',
+  },
 
-    position: "relative",
-    // "&:hover": {
-    //   "& $controlsWrapper": {
-    //     visibility: "visible",
-    //   },
-    // },
+  reactPlayer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
   },
 
   controlsWrapper: {
-    visibility: "hidden",
-    position: "absolute",
+    visibility: 'hidden',
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    background: "rgba(0,0,0,0.4)",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
+    background: 'rgba(0,0,0,0.4)',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
   },
   topControls: {
-    display: "flex",
-    justifyContent: "flex-end",
+    display: 'flex',
+    justifyContent: 'flex-end',
     padding: theme.spacing(2),
   },
   middleControls: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   bottomWrapper: {
-    display: "flex",
-    flexDirection: "column",
+    display: 'flex',
+    flexDirection: 'column',
 
     // background: "rgba(0,0,0,0.6)",
     // height: 60,
@@ -50,9 +52,9 @@ const useStyles = makeStyles((theme) => ({
   },
 
   bottomControls: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     // height:40,
   },
 
@@ -60,20 +62,20 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(1),
   },
   controlIcons: {
-    color: "#777",
+    color: '#777',
 
     fontSize: 50,
-    transform: "scale(0.9)",
-    "&:hover": {
-      color: "#fff",
-      transform: "scale(1)",
+    transform: 'scale(0.9)',
+    '&:hover': {
+      color: '#fff',
+      transform: 'scale(1)',
     },
   },
 
   bottomIcons: {
-    color: "#999",
-    "&:hover": {
-      color: "#fff",
+    color: '#999',
+    '&:hover': {
+      color: '#fff',
     },
   },
 
@@ -89,9 +91,12 @@ const format = (seconds: number) => {
   const date = new Date(seconds * 1000);
   const hh = date.getUTCHours();
   const mm = date.getUTCMinutes();
-  const ss = date.getUTCSeconds().toString().padStart(2, "0");
+  const ss = date
+    .getUTCSeconds()
+    .toString()
+    .padStart(2, '0');
   if (hh) {
-    return `${hh}:${mm.toString().padStart(2, "0")}:${ss}`;
+    return `${hh}:${mm.toString().padStart(2, '0')}:${ss}`;
   }
   return `${mm}:${ss}`;
 };
@@ -103,7 +108,7 @@ function CustomVideoPlayer() {
   const [showControls, setShowControls] = useState(false);
   // const [count, setCount] = useState(0);
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [timeDisplayFormat, setTimeDisplayFormat] = React.useState("normal");
+  const [timeDisplayFormat, setTimeDisplayFormat] = React.useState('normal');
   const [bookmarks, setBookmarks] = useState([]);
   const [state, setState] = useState({
     pip: false,
@@ -122,19 +127,7 @@ function CustomVideoPlayer() {
   const playerRef = useRef<any>(null);
   const playerContainerRef = useRef<any>(null);
   const controlsRef = useRef<any>(null);
-  const canvasRef = useRef<any>(null);
-  const {
-    playing,
-    controls,
-    light,
-    muted,
-    loop,
-    playbackRate,
-    pip,
-    played,
-    seeking,
-    volume,
-  } = state;
+  const { playing = false, light, muted = false, loop, playbackRate, pip, played, seeking, volume } = state;
 
   const handlePlayPause = () => {
     setState({ ...state, playing: !state.playing });
@@ -150,10 +143,10 @@ function CustomVideoPlayer() {
 
   const handleProgress = (changeState: any) => {
     if (count > 3) {
-      controlsRef.current.style.visibility = "hidden";
+      controlsRef.current.style.visibility = 'hidden';
       count = 0;
     }
-    if (controlsRef.current.style.visibility == "visible") {
+    if (controlsRef.current.style.visibility == 'visible') {
       count += 1;
     }
     if (!state.seeking) {
@@ -174,7 +167,7 @@ function CustomVideoPlayer() {
     console.log({ value: e.target });
     setState({ ...state, seeking: false });
     // console.log(sliderRef.current.value)
-    playerRef.current.seekTo(newValue / 100, "fraction");
+    playerRef.current.seekTo(newValue / 100, 'fraction');
   };
 
   const handleDuration = (duration: number) => {
@@ -198,20 +191,18 @@ function CustomVideoPlayer() {
   };
 
   const handleMouseMove = () => {
-    console.log("mousemove");
-    controlsRef.current.style.visibility = "visible";
+    console.log('mousemove');
+    controlsRef.current.style.visibility = 'visible';
     count = 0;
   };
 
   const hanldeMouseLeave = () => {
-    controlsRef.current.style.visibility = "hidden";
+    controlsRef.current.style.visibility = 'hidden';
     count = 0;
   };
 
   const handleDisplayFormat = () => {
-    setTimeDisplayFormat(
-      timeDisplayFormat == "normal" ? "remaining" : "normal"
-    );
+    setTimeDisplayFormat(timeDisplayFormat == 'normal' ? 'remaining' : 'normal');
   };
 
   const handlePlaybackRate = (rate: number) => {
@@ -222,78 +213,69 @@ function CustomVideoPlayer() {
     setState({ ...state, muted: !state.muted });
   };
 
-  const currentTime =
-    playerRef && playerRef.current
-      ? playerRef.current.getCurrentTime()
-      : "00:00";
+  const currentTime = playerRef && playerRef.current ? playerRef.current.getCurrentTime() : '00:00';
 
-  const duration =
-    playerRef && playerRef.current ? playerRef.current.getDuration() : "00:00";
-  const elapsedTime =
-    timeDisplayFormat == "normal"
-      ? format(currentTime)
-      : `-${format(duration - currentTime)}`;
+  const duration = playerRef && playerRef.current ? playerRef.current.getDuration() : '00:00';
+  const elapsedTime = timeDisplayFormat == 'normal' ? format(currentTime) : `-${format(duration - currentTime)}`;
 
   const totalDuration = format(duration);
 
   return (
     <>
-      <Container maxWidth="md">
-        <div
-          onMouseMove={handleMouseMove}
-          onMouseLeave={hanldeMouseLeave}
-          ref={playerContainerRef}
-          className={classes.playerWrapper}
-        >
-          <ReactPlayer
-            ref={playerRef}
-            width="100%"
-            height="100%"
-            url="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
-            pip={pip}
-            playing={playing}
-            controls={false}
-            light={light}
-            loop={loop}
-            playbackRate={playbackRate}
-            volume={volume}
-            muted={muted}
-            onProgress={handleProgress}
-            config={{
-              file: {
-                attributes: {
-                  crossorigin: "anonymous",
-                },
+      <div
+        onMouseMove={handleMouseMove}
+        onMouseLeave={hanldeMouseLeave}
+        ref={playerContainerRef}
+        className={classes.playerWrapper}
+      >
+        <ReactPlayer
+          ref={playerRef}
+          className={classes.reactPlayer}
+          width="100%"
+          height="100%"
+          url="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+          pip={pip}
+          playing={playing}
+          controls={showControls}
+          light={light}
+          loop={loop}
+          playbackRate={playbackRate}
+          volume={volume}
+          muted={muted}
+          onProgress={handleProgress}
+          config={{
+            file: {
+              attributes: {
+                crossorigin: 'anonymous',
               },
-            }}
-          />
+            },
+          }}
+        />
 
-          <Controls
-            ref={controlsRef}
-            onSeek={handleSeekChange}
-            onSeekMouseDown={handleSeekMouseDown}
-            onSeekMouseUp={handleSeekMouseUp}
-            onDuration={handleDuration}
-            onRewind={handleRewind}
-            onPlayPause={handlePlayPause}
-            onFastForward={handleFastForward}
-            playing={playing}
-            played={played}
-            elapsedTime={elapsedTime}
-            totalDuration={totalDuration}
-            onMute={hanldeMute}
-            muted={muted}
-            onVolumeChange={handleVolumeChange}
-            onVolumeSeekDown={handleVolumeSeekDown}
-            onChangeDispayFormat={handleDisplayFormat}
-            playbackRate={playbackRate}
-            onPlaybackRateChange={handlePlaybackRate}
-            onToggleFullScreen={toggleFullScreen}
-            volume={volume}
-          />
-        </div>
-        <canvas ref={canvasRef} />
-      </Container>
+        <Controls
+          ref={controlsRef}
+          onSeek={handleSeekChange}
+          onSeekMouseDown={handleSeekMouseDown}
+          onSeekMouseUp={handleSeekMouseUp}
+          onDuration={handleDuration}
+          onRewind={handleRewind}
+          onPlayPause={handlePlayPause}
+          onFastForward={handleFastForward}
+          playing={playing}
+          played={played}
+          elapsedTime={elapsedTime}
+          totalDuration={totalDuration}
+          onMute={hanldeMute}
+          muted={muted}
+          onVolumeChange={handleVolumeChange}
+          onVolumeSeekDown={handleVolumeSeekDown}
+          onChangeDispayFormat={handleDisplayFormat}
+          playbackRate={playbackRate}
+          onPlaybackRateChange={handlePlaybackRate}
+          onToggleFullScreen={toggleFullScreen}
+          volume={volume}
+        />
+      </div>
     </>
   );
 }
