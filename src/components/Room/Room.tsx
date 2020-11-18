@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import ParticipantList from '../ParticipantList/ParticipantList';
 import { styled } from '@material-ui/core/styles';
-import VideoPlayer from '../VideoPlayer/VideoPlayer';
+import React, { useEffect, useState } from 'react';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 import { useAppState, useDbState } from '../../state';
-import { MULTI } from '../../state/media/media';
-import { docToMedia } from '../../state/media/media';
-import NoMediaDialog, { NoMediaText } from '../Dialogs/NoMediaDialog';
+import { docToMedia, MULTI } from '../../state/media/media';
+import { NoMediaText } from '../Dialogs/NoMediaDialog';
+import ParticipantList from '../ParticipantList/ParticipantList';
 import CustomVideoPlayer from '../VideoPlayer/CustomVideoPlayer';
 
 const Container = styled('div')(({ theme }) => ({
@@ -36,19 +34,26 @@ export default function Room() {
       setHasInit(true);
 
       // Add a listener for remote media changes
+      // FIX IF DATA NOT EXISTS
       db.collection('rooms')
         .doc(room.name)
-        .onSnapshot(function(doc) {
-          console.log('Current data: ', doc.data());
-          dispatchLocalMedia({
-            name: MULTI,
-            value: { playing: doc.data()!.playing, timestamp: doc.data()!.timestamp },
-          });
+        .onSnapshot(
+          function(doc) {
+            if (doc.data()) {
+              dispatchLocalMedia({
+                name: MULTI,
+                value: { playing: doc.data()!.playing, timestamp: doc.data()!.timestamp },
+              });
 
-          if (!doc.data()!.url)
-            // data reset, reset the remote media too
-            dispatchRemoteMedia({ name: MULTI, value: { ...docToMedia(doc.data()) } });
-        });
+              if (!doc.data()!.url)
+                // data reset, reset the remote media too
+                dispatchRemoteMedia({ name: MULTI, value: { ...docToMedia(doc.data()) } });
+            }
+          },
+          function(error) {
+            console.log(error.message);
+          }
+        );
 
       getFromDb(db, room.name)
         .then((doc: any) => {
@@ -91,7 +96,7 @@ export default function Room() {
     <Container>
       <CustomVideoPlayer />
       <ParticipantList />
-      {showDialog && <NoMediaDialog text={dialogMessage} />}
+      {/* {showDialog && <NoMediaDialog text={dialogMessage} />} */}
     </Container>
   );
 }

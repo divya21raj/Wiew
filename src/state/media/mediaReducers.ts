@@ -1,29 +1,29 @@
-import { Media, MULTI, MediaSource } from "./media";
+import { Media, MULTI, SOURCEMAP } from './media';
 
 export interface MediaAction {
-  name: (keyof Media) | string;
+  name: keyof Media | string;
   value: any;
 }
 
 export const initialRemoteMedia: Media = {
-  url: "",
-  source: MediaSource.LOCAL,
+  url: '',
+  source: SOURCEMAP.YT,
   playing: false,
   timestamp: 0,
-  fileName: ""
+  fileName: '',
 };
 
 export const initialLocalMedia: Media = {
-  url: "",
-  source: MediaSource.LOCAL,
+  url: 'https://www.youtube.com/watch?v=br0NW9ufUUw',
+  source: SOURCEMAP.YT,
   playing: false,
   timestamp: 0,
-  fileName: ""
+  fileName: '',
 };
 
 export function remoteMediaReducer(state: Media, action: MediaAction) {
-  if(action.name===MULTI) {
-    return {...state, ...action.value }
+  if (action.name === MULTI) {
+    return { ...state, ...action.value };
   }
   return {
     ...state,
@@ -32,8 +32,8 @@ export function remoteMediaReducer(state: Media, action: MediaAction) {
 }
 
 export function localMediaReducer(state: Media, action: MediaAction) {
-  if(action.name===MULTI) {
-    return {...state, ...action.value }
+  if (action.name === MULTI) {
+    return { ...state, ...action.value };
   }
   return {
     ...state,

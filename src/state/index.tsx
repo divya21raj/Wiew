@@ -1,14 +1,20 @@
+import { User } from 'firebase';
 import React, { createContext, useContext, useReducer, useState } from 'react';
-import { RoomType } from '../types';
 import { TwilioError } from 'twilio-video';
-import { settingsReducer, initialSettings, Settings, SettingsAction } from './settings/settingsReducer';
+import { RoomType } from '../types';
+import { Media } from './media/media';
+import {
+  initialLocalMedia,
+  initialRemoteMedia,
+  localMediaReducer,
+  MediaAction,
+  remoteMediaReducer,
+} from './media/mediaReducers';
+import { initialSettings, Settings, SettingsAction, settingsReducer } from './settings/settingsReducer';
 import useActiveSinkId from './useActiveSinkId/useActiveSinkId';
+import { getFromDb, setInDb, updateInDb, useFirebaseDb } from './useDb/useDb';
 import useFirebaseAuth from './useFirebaseAuth/useFirebaseAuth';
 import usePasscodeAuth from './usePasscodeAuth/usePasscodeAuth';
-import { User } from 'firebase';
-import { initialLocalMedia, initialRemoteMedia, localMediaReducer, MediaAction, remoteMediaReducer } from './media/mediaReducers';
-import { useFirebaseDb, setInDb, getFromDb, updateInDb, listenInDb } from './useDb/useDb'
-import { Media } from './media/media';
 
 export interface StateContextType {
   error: TwilioError | null;
@@ -115,11 +121,10 @@ export function AppStateProvider(props: React.PropsWithChildren<{}>) {
 
 export function DbStateProvider(props: React.PropsWithChildren<{}>) {
   let dbContextValue = {
-    ...useFirebaseDb(),  
+    ...useFirebaseDb(),
     setInDb: setInDb,
     updateInDb: updateInDb,
     getFromDb: getFromDb,
-    listenInDb: listenInDb
   } as DbContextType;
 
   return <DbStateContext.Provider value={{ ...dbContextValue }}>{props.children}</DbStateContext.Provider>;

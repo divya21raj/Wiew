@@ -1,20 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-
+import { Grid, Hidden, Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
-import EndCallButton from '../Buttons/EndCallButton/EndCallButton';
-import FlipCameraButton from './FlipCameraButton/FlipCameraButton';
-import Menu from './Menu/Menu';
-
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import React, { useEffect, useState } from 'react';
 import useRoomState from '../../hooks/useRoomState/useRoomState';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
-import { Typography, Grid, Hidden } from '@material-ui/core';
+import { useAppState } from '../../state';
+import EndCallButton from '../Buttons/EndCallButton/EndCallButton';
+import MediaController from '../Buttons/MediaController/MediaController';
 import ToggleAudioButton from '../Buttons/ToggleAudioButton/ToggleAudioButton';
 import ToggleVideoButton from '../Buttons/ToggleVideoButton/ToggleVideoButton';
 import ToggleScreenShareButton from '../Buttons/ToogleScreenShareButton/ToggleScreenShareButton';
-import UploadFileButton from '../Buttons/UploadFileButton/UploadFileButton';
-import { useAppState } from '../../state';
-import ResetMediaButton from '../Buttons/ResetMediaButton/ResetMediaButton';
+import FlipCameraButton from './FlipCameraButton/FlipCameraButton';
+import Menu from './Menu/Menu';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -89,13 +86,7 @@ export default function MenuBar() {
       <footer className={classes.container}>
         <Grid container justify="space-around" alignItems="center">
           <Hidden smDown>
-            <UploadFileButton />
-            <ResetMediaButton />
-            <Grid style={{ flex: 1, padding: "10px" }}>
-              <Typography variant="body1">{
-                fileName===""?"No file loaded":fileName
-              }</Typography>
-            </Grid>
+            <MediaController />
           </Hidden>
           <Grid item>
             <Grid container justify="center">

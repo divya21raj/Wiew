@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
+import { useEffect, useState } from 'react';
+import { docToMedia, instanceOfMedia } from '../media/media';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -8,10 +9,10 @@ const firebaseConfig = {
   databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
   storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-  projectId: process.env.REACT_APP_PROJECT_ID
+  projectId: process.env.REACT_APP_PROJECT_ID,
 };
 
-const collection = "rooms";
+const collection = 'rooms';
 
 export function useFirebaseDb() {
   const [db, setDb] = useState<firebase.firestore.Firestore | null>(null);
@@ -32,8 +33,12 @@ export function useFirebaseDb() {
  * @param docId id of the doc to set
  * @param doc body of the doc. Has to the full object, as overwrite will happen
  */
-export function setInDb( db: firebase.firestore.Firestore, docId: string, doc: any) {
-  return db.collection(collection).doc(docId).set(doc);
+export function setInDb(db: firebase.firestore.Firestore, docId: string, doc: any) {
+  if (instanceOfMedia(doc)) doc = docToMedia(doc);
+  return db
+    .collection(collection)
+    .doc(docId)
+    .set(doc);
 }
 
 /**
@@ -43,18 +48,17 @@ export function setInDb( db: firebase.firestore.Firestore, docId: string, doc: a
  * @param docId id of the doc to set
  * @param doc body of the doc. Can be just a subset of the full object
  */
-export function updateInDb( db: firebase.firestore.Firestore, docId: string, doc: any) {
-  return db.collection(collection).doc(docId).set(doc, {merge: true});
+export function updateInDb(db: firebase.firestore.Firestore, docId: string, doc: any) {
+  if (instanceOfMedia(doc)) doc = docToMedia(doc);
+  return db
+    .collection(collection)
+    .doc(docId)
+    .set(doc, { merge: true });
 }
 
-export function getFromDb( db: firebase.firestore.Firestore, docId: string ) {
-  return db.collection(collection).doc(docId).get();
-}
-
-export function listenInDb( db: firebase.firestore.Firestore, docId: string, action: (doc:any) => void ) {
-  db.collection(collection).doc(docId)
-    .onSnapshot(function(doc) {
-        console.log("Current data: ", doc.data());
-        action(doc);
-    });
+export function getFromDb(db: firebase.firestore.Firestore, docId: string) {
+  return db
+    .collection(collection)
+    .doc(docId)
+    .get();
 }

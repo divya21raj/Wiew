@@ -1,9 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
-import Container from '@material-ui/core/Container';
-import ReactPlayer from 'react-player';
 import { makeStyles } from '@material-ui/core/styles';
-
+import React, { useRef, useState } from 'react';
+import ReactPlayer from 'react-player';
 import screenful, { Screenfull } from 'screenfull';
+import { useAppState } from '../../state';
 import Controls from './Controls';
 
 const useStyles = makeStyles(theme => ({
@@ -105,11 +104,12 @@ let count = 0;
 
 function CustomVideoPlayer() {
   const classes = useStyles();
+
+  const { localMedia, remoteMedia, dispatchLocalMedia, dispatchRemoteMedia } = useAppState();
+
   const [showControls, setShowControls] = useState(false);
   // const [count, setCount] = useState(0);
-  const [anchorEl, setAnchorEl] = React.useState(null);
   const [timeDisplayFormat, setTimeDisplayFormat] = React.useState('normal');
-  const [bookmarks, setBookmarks] = useState([]);
   const [state, setState] = useState({
     pip: false,
     playing: true,
@@ -233,7 +233,7 @@ function CustomVideoPlayer() {
           className={classes.reactPlayer}
           width="100%"
           height="100%"
-          url="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+          url={localMedia.url}
           pip={pip}
           playing={playing}
           controls={showControls}
