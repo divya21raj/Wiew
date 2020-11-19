@@ -16,7 +16,7 @@ import { getFromDb, setInDb, updateInDb, useFirebaseDb } from './useDb/useDb';
 import useFirebaseAuth from './useFirebaseAuth/useFirebaseAuth';
 import usePasscodeAuth from './usePasscodeAuth/usePasscodeAuth';
 
-export interface StateContextType {
+export interface AppStateContextType {
   error: TwilioError | null;
   setError(error: TwilioError | null): void;
   getToken(name: string, room: string, passcode?: string): Promise<string>;
@@ -36,7 +36,7 @@ export interface StateContextType {
   roomType?: RoomType;
 }
 
-export interface DbContextType {
+export interface DbContextContextType {
   db: firebase.firestore.Firestore;
   setInDb: any;
   updateInDb: any;
@@ -44,8 +44,8 @@ export interface DbContextType {
   listenInDb: any;
 }
 
-export const StateContext = createContext<StateContextType>(null!);
-export const DbStateContext = createContext<DbContextType>(null!);
+export const StateContext = createContext<AppStateContextType>(null!);
+export const DbStateContext = createContext<DbContextContextType>(null!);
 
 /*
   The 'react-hooks/rules-of-hooks' linting rules prevent React Hooks fron being called
@@ -76,7 +76,7 @@ export function AppStateProvider(props: React.PropsWithChildren<{}>) {
     dispatchRemoteMedia,
     localMedia,
     dispatchLocalMedia,
-  } as StateContextType;
+  } as AppStateContextType;
 
   if (process.env.REACT_APP_SET_AUTH === 'firebase') {
     contextValue = {
@@ -101,7 +101,7 @@ export function AppStateProvider(props: React.PropsWithChildren<{}>) {
     };
   }
 
-  const getToken: StateContextType['getToken'] = (name, room) => {
+  const getToken: AppStateContextType['getToken'] = (name, room) => {
     setIsFetching(true);
     return contextValue
       .getToken(name, room)
@@ -125,7 +125,7 @@ export function DbStateProvider(props: React.PropsWithChildren<{}>) {
     setInDb: setInDb,
     updateInDb: updateInDb,
     getFromDb: getFromDb,
-  } as DbContextType;
+  } as DbContextContextType;
 
   return <DbStateContext.Provider value={{ ...dbContextValue }}>{props.children}</DbStateContext.Provider>;
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import makeStyles from '@material-ui/styles/makeStyles';
 import Person from '@material-ui/icons/Person';
-import { StateContextType } from '../../../../state';
+import { AppStateContextType } from '../../../../state';
 
 const useStyles = makeStyles({
   red: {
@@ -19,7 +19,7 @@ export function getInitials(name: string) {
     .toUpperCase();
 }
 
-export default function UserAvatar({ user }: { user: StateContextType['user'] }) {
+export default function UserAvatar({ user }: { user: AppStateContextType['user'] }) {
   const classes = useStyles();
   const { displayName, photoURL } = user!;
 

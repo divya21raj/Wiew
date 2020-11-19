@@ -6,7 +6,7 @@ import { MULTI, SOURCEMAP } from '../../../state/media/media';
 
 export default function YouTubeController() {
   const [value, setValue] = useState('');
-  const { remoteMedia, localMedia, dispatchRemoteMedia, dispatchLocalMedia } = useAppState();
+  const { dispatchLocalMedia } = useAppState();
 
   const handleChange = (event: any) => {
     setValue(event.target.value);
