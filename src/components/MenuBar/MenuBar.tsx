@@ -1,10 +1,9 @@
 import { Grid, Hidden, Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import useRoomState from '../../hooks/useRoomState/useRoomState';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
-import { useAppState } from '../../state';
 import EndCallButton from '../Buttons/EndCallButton/EndCallButton';
 import MediaController from '../Buttons/MediaController/MediaController';
 import ToggleAudioButton from '../Buttons/ToggleAudioButton/ToggleAudioButton';
@@ -66,14 +65,7 @@ export default function MenuBar() {
   const classes = useStyles();
   const { isSharingScreen, toggleScreenShare } = useVideoContext();
   const roomState = useRoomState();
-  const { remoteMedia } = useAppState();
   const isReconnecting = roomState === 'reconnecting';
-
-  const [fileName, setFileName] = useState(remoteMedia.fileName);
-
-  useEffect(() => {
-    setFileName(remoteMedia.fileName);
-  }, [remoteMedia.fileName]);
 
   return (
     <>

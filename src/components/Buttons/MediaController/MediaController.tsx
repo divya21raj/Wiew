@@ -1,13 +1,12 @@
 import { Button, Grid, IconButton, Popover, Typography } from '@material-ui/core';
-import React, { useCallback, useEffect, useState } from 'react';
-import useVideoContext from '../../../hooks/useVideoContext/useVideoContext';
-import { useAppState, useDbState } from '../../../state';
-import { MULTI, SOURCEMAP } from '../../../state/media/media';
+import React from 'react';
+import { useMediaState } from '../../../state';
+import { SOURCEMAP } from '../../../state/media/media';
 
 //https://masakudamatsu.medium.com/how-to-customize-the-file-upload-button-in-react-b3866a5973d8
 
 export default function MediaController(props: { className?: string }) {
-  const { localMedia, dispatchLocalMedia } = useAppState();
+  const { localMedia, dispatchLocalMedia } = useMediaState();
 
   const [anchorEl, setAnchorEl] = React.useState(null);
 

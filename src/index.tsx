@@ -5,7 +5,7 @@ import { CssBaseline } from '@material-ui/core';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
 import App from './App';
-import { DbStateProvider, AppStateProvider, useAppState } from './state';
+import { DbStateProvider, AppStateProvider, useAppState, MediaStateProvider } from './state';
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 import ErrorDialog from './components/ErrorDialog/ErrorDialog';
 import LoginPage from './components/LoginPage/LoginPage';
@@ -36,18 +36,20 @@ ReactDOM.render(
     <Router>
       <AppStateProvider>
         <DbStateProvider>
-          <Switch>
-            <PrivateRoute exact path="/">
-              <VideoApp />
-            </PrivateRoute>
-            <PrivateRoute path="/room/:URLRoomName">
-              <VideoApp />
-            </PrivateRoute>
-            <Route path="/login">
-              <LoginPage />
-            </Route>
-            <Redirect to="/" />
-          </Switch>
+          <MediaStateProvider>
+            <Switch>
+              <PrivateRoute exact path="/">
+                <VideoApp />
+              </PrivateRoute>
+              <PrivateRoute path="/room/:URLRoomName">
+                <VideoApp />
+              </PrivateRoute>
+              <Route path="/login">
+                <LoginPage />
+              </Route>
+              <Redirect to="/" />
+            </Switch>
+          </MediaStateProvider>
         </DbStateProvider>
       </AppStateProvider>
     </Router>

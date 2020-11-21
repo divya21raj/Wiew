@@ -2,7 +2,7 @@ import React from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import makeStyles from '@material-ui/styles/makeStyles';
 import Person from '@material-ui/icons/Person';
-import { AppStateContextType } from '../../../../state';
+import { AppStateContextType } from '../../../../state/appState';
 
 const useStyles = makeStyles({
   red: {

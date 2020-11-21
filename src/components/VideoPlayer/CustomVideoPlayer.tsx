@@ -1,8 +1,9 @@
 import { makeStyles } from '@material-ui/core/styles';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
 import screenful, { Screenfull } from 'screenfull';
-import { useAppState } from '../../state';
+import { useMediaState } from '../../state';
+import { MULTI } from '../../state/media/media';
 import Controls from './Controls';
 
 const useStyles = makeStyles(theme => ({
@@ -105,10 +106,11 @@ let count = 0;
 function CustomVideoPlayer() {
   const classes = useStyles();
 
-  const { localMedia, remoteMedia, dispatchLocalMedia, dispatchRemoteMedia } = useAppState();
+  const { localMedia, dispatchLocalMedia } = useMediaState();
 
   const [showControls, setShowControls] = useState(false);
   // const [count, setCount] = useState(0);
+  const [ready, setReady] = useState(false);
   const [timeDisplayFormat, setTimeDisplayFormat] = React.useState('normal');
   const [state, setState] = useState({
     pip: false,
@@ -116,7 +118,7 @@ function CustomVideoPlayer() {
     controls: false,
     light: false,
     muted: true,
-    played: 0,
+    playedSeconds: 0,
     duration: 0,
     playbackRate: 1.0,
     volume: 1,
@@ -127,10 +129,35 @@ function CustomVideoPlayer() {
   const playerRef = useRef<any>(null);
   const playerContainerRef = useRef<any>(null);
   const controlsRef = useRef<any>(null);
-  const { playing = false, light, muted = false, loop, playbackRate, pip, played, seeking, volume } = state;
+  const {
+    playing = false,
+    light,
+    muted = false,
+    loop,
+    playbackRate,
+    pip,
+    playedSeconds: played,
+    seeking,
+    volume,
+  } = state;
+
+  useEffect(() => {
+    console.log('Is Ready to playtoggle? ' + ready);
+    if (ready) {
+      console.log('Upload in playToggle');
+      console.log(state.playedSeconds - playerRef.current.getCurrentTime());
+      if (Math.abs(state.playedSeconds - playerRef.current.getCurrentTime()) < 1)
+        dispatchLocalMedia({ name: MULTI, value: { playing: playing, timestamp: state.playedSeconds } });
+    }
+  }, [state.playing]);
 
   const handlePlayPause = () => {
     setState({ ...state, playing: !state.playing });
+    console.log('Is Ready to playtoggle? ' + ready);
+    if (ready) {
+      console.log('Upload in playToggle');
+      dispatchLocalMedia({ name: MULTI, value: { playing: playing, timestamp: state.playedSeconds } });
+    }
   };
 
   const handleRewind = () => {
@@ -156,7 +183,7 @@ function CustomVideoPlayer() {
 
   const handleSeekChange = (e: any, newValue: any) => {
     console.log({ newValue });
-    setState({ ...state, played: newValue / 100 });
+    setState({ ...state, playedSeconds: newValue });
   };
 
   const handleSeekMouseDown = (e: any) => {
@@ -167,7 +194,16 @@ function CustomVideoPlayer() {
     console.log({ value: e.target });
     setState({ ...state, seeking: false });
     // console.log(sliderRef.current.value)
-    playerRef.current.seekTo(newValue / 100, 'fraction');
+    playerRef.current.seekTo(newValue);
+  };
+
+  const handleOnReady = () => {
+    console.log('onReady');
+    setReady(true);
+    if (state.seeking) {
+      dispatchLocalMedia({ name: 'timestamp', value: playerRef.current.getCurrentTime() });
+      console.log('Upload');
+    }
   };
 
   const handleDuration = (duration: number) => {
@@ -184,6 +220,11 @@ function CustomVideoPlayer() {
       volume: newValue / 100,
       muted: newValue === 0 ? true : false,
     });
+  };
+
+  const handleOnBuffer = () => {
+    console.log('onBuffer');
+    setReady(false);
   };
 
   const toggleFullScreen = () => {
@@ -243,6 +284,8 @@ function CustomVideoPlayer() {
           volume={volume}
           muted={muted}
           onProgress={handleProgress}
+          onReady={handleOnReady}
+          onBuffer={handleOnBuffer}
           config={{
             file: {
               attributes: {

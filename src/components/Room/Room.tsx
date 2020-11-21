@@ -1,7 +1,7 @@
 import { styled } from '@material-ui/core/styles';
 import React, { useEffect, useState } from 'react';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
-import { useAppState, useDbState } from '../../state';
+import { useAppState, useDbState, useMediaState } from '../../state';
 import { docToMedia, MULTI } from '../../state/media/media';
 import { NoMediaText } from '../Dialogs/NoMediaDialog';
 import ParticipantList from '../ParticipantList/ParticipantList';
@@ -25,7 +25,7 @@ export default function Room() {
   const [dialogMessage, setDialogMessage] = useState(NoMediaText.NO_FILE);
 
   const { db, setInDb, getFromDb } = useDbState();
-  const { localMedia, remoteMedia, user, dispatchRemoteMedia, dispatchLocalMedia } = useAppState();
+  const { localMedia, dispatchLocalMedia } = useMediaState();
   const { room } = useVideoContext();
 
   useEffect(() => {
@@ -33,36 +33,14 @@ export default function Room() {
     if (!hasInit) {
       setHasInit(true);
 
-      // Add a listener for remote media changes
-      // FIX IF DATA NOT EXISTS
-      db.collection('rooms')
-        .doc(room.name)
-        .onSnapshot(
-          function(doc) {
-            if (doc.data()) {
-              dispatchLocalMedia({
-                name: MULTI,
-                value: { playing: doc.data()!.playing, timestamp: doc.data()!.timestamp },
-              });
-
-              if (!doc.data()!.url)
-                // data reset, reset the remote media too
-                dispatchRemoteMedia({ name: MULTI, value: { ...docToMedia(doc.data()) } });
-            }
-          },
-          function(error) {
-            console.log(error.message);
-          }
-        );
-
       getFromDb(db, room.name)
         .then((doc: any) => {
           if (doc.exists) {
             // someone already in room, match that data
-            dispatchRemoteMedia({ name: MULTI, value: { ...docToMedia(doc.data()) } });
+            dispatchLocalMedia({ name: MULTI, value: { ...docToMedia(doc.data()) } });
           } else {
             // No one in the room, init it
-            setInDb(db, room.name, { ...remoteMedia })
+            setInDb(db, room.name, { ...localMedia })
               .then(function() {
                 console.log('inited empty room');
               })
@@ -79,18 +57,17 @@ export default function Room() {
     }
 
     console.log(localMedia);
-    console.log(remoteMedia);
 
-    if (!(localMedia.fileName && remoteMedia.fileName)) {
-      // nothing loaded, prompt user to load something
-      setDialogMessage(NoMediaText.NO_FILE);
-      setShowDialog(true);
-    } else if (localMedia.fileName !== remoteMedia.fileName) {
-      // fileName mismatch, prompt to load new file
-      setDialogMessage(NoMediaText.NO_MATCH);
-      setShowDialog(true);
-    } else setShowDialog(false);
-  }, [remoteMedia, localMedia.fileName]);
+    // if (!(localMedia.fileName && remoteMedia.fileName)) {
+    //   // nothing loaded, prompt user to load something
+    //   setDialogMessage(NoMediaText.NO_FILE);
+    //   setShowDialog(true);
+    // } else if (localMedia.fileName !== remoteMedia.fileName) {
+    //   // fileName mismatch, prompt to load new file
+    //   setDialogMessage(NoMediaText.NO_MATCH);
+    //   setShowDialog(true);
+    // } else setShowDialog(false);
+  }, [localMedia.fileName]);
 
   return (
     <Container>

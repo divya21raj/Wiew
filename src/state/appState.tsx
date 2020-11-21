@@ -2,17 +2,8 @@ import { User } from 'firebase';
 import React, { createContext, useContext, useReducer, useState } from 'react';
 import { TwilioError } from 'twilio-video';
 import { RoomType } from '../types';
-import { Media } from './media/media';
-import {
-  initialLocalMedia,
-  initialRemoteMedia,
-  localMediaReducer,
-  MediaAction,
-  remoteMediaReducer,
-} from './media/mediaReducers';
 import { initialSettings, Settings, SettingsAction, settingsReducer } from './settings/settingsReducer';
 import useActiveSinkId from './useActiveSinkId/useActiveSinkId';
-import { getFromDb, setInDb, updateInDb, useFirebaseDb } from './useDb/useDb';
 import useFirebaseAuth from './useFirebaseAuth/useFirebaseAuth';
 import usePasscodeAuth from './usePasscodeAuth/usePasscodeAuth';
 
@@ -29,23 +20,10 @@ export interface AppStateContextType {
   setActiveSinkId(sinkId: string): void;
   settings: Settings;
   dispatchSetting: React.Dispatch<SettingsAction>;
-  remoteMedia: Media;
-  dispatchRemoteMedia: React.Dispatch<MediaAction>;
-  localMedia: Media;
-  dispatchLocalMedia: React.Dispatch<MediaAction>;
   roomType?: RoomType;
 }
 
-export interface DbContextContextType {
-  db: firebase.firestore.Firestore;
-  setInDb: any;
-  updateInDb: any;
-  getFromDb: any;
-  listenInDb: any;
-}
-
-export const StateContext = createContext<AppStateContextType>(null!);
-export const DbStateContext = createContext<DbContextContextType>(null!);
+export const AppStateContext = createContext<AppStateContextType>(null!);
 
 /*
   The 'react-hooks/rules-of-hooks' linting rules prevent React Hooks fron being called
@@ -61,8 +39,6 @@ export function AppStateProvider(props: React.PropsWithChildren<{}>) {
   const [isFetching, setIsFetching] = useState(false);
   const [activeSinkId, setActiveSinkId] = useActiveSinkId();
   const [settings, dispatchSetting] = useReducer(settingsReducer, initialSettings);
-  const [remoteMedia, dispatchRemoteMedia] = useReducer(remoteMediaReducer, initialRemoteMedia);
-  const [localMedia, dispatchLocalMedia] = useReducer(localMediaReducer, initialLocalMedia);
 
   let contextValue = {
     error,
@@ -72,10 +48,6 @@ export function AppStateProvider(props: React.PropsWithChildren<{}>) {
     setActiveSinkId,
     settings,
     dispatchSetting,
-    remoteMedia,
-    dispatchRemoteMedia,
-    localMedia,
-    dispatchLocalMedia,
   } as AppStateContextType;
 
   if (process.env.REACT_APP_SET_AUTH === 'firebase') {
@@ -116,32 +88,13 @@ export function AppStateProvider(props: React.PropsWithChildren<{}>) {
       });
   };
 
-  return <StateContext.Provider value={{ ...contextValue, getToken }}>{props.children}</StateContext.Provider>;
-}
-
-export function DbStateProvider(props: React.PropsWithChildren<{}>) {
-  let dbContextValue = {
-    ...useFirebaseDb(),
-    setInDb: setInDb,
-    updateInDb: updateInDb,
-    getFromDb: getFromDb,
-  } as DbContextContextType;
-
-  return <DbStateContext.Provider value={{ ...dbContextValue }}>{props.children}</DbStateContext.Provider>;
+  return <AppStateContext.Provider value={{ ...contextValue, getToken }}>{props.children}</AppStateContext.Provider>;
 }
 
 export function useAppState() {
-  const context = useContext(StateContext);
+  const context = useContext(AppStateContext);
   if (!context) {
     throw new Error('useAppState must be used within the AppStateProvider');
-  }
-  return context;
-}
-
-export function useDbState() {
-  const context = useContext(DbStateContext);
-  if (!context) {
-    throw new Error('useDbState must be used within the DbStateProvider');
   }
   return context;
 }

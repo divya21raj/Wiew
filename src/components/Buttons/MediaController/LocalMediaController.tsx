@@ -1,12 +1,12 @@
 import { Button, Grid, Typography } from '@material-ui/core';
 import React, { useCallback, useEffect } from 'react';
 import useVideoContext from '../../../hooks/useVideoContext/useVideoContext';
-import { useAppState, useDbState } from '../../../state';
+import { useDbState, useMediaState } from '../../../state';
 import { MULTI } from '../../../state/media/media';
 import ResetMediaButton from '../ResetMediaButton/ResetMediaButton';
 
 export default function LocalMediaController() {
-  const { remoteMedia, localMedia, dispatchRemoteMedia, dispatchLocalMedia } = useAppState();
+  const { localMedia, dispatchLocalMedia } = useMediaState();
   const { db, updateInDb } = useDbState();
   const { room } = useVideoContext();
 
@@ -23,10 +23,10 @@ export default function LocalMediaController() {
       let file = files[0];
       let urlString = URL.createObjectURL(file);
 
-      if (remoteMedia.fileName && remoteMedia.fileName !== file.name) {
-        console.error("Files don't match!");
-        urlString = '';
-      }
+      // if (remoteMedia.fileName && remoteMedia.fileName !== file.name) {
+      //   console.error("Files don't match!");
+      //   urlString = '';
+      // }
       dispatchLocalMedia({ name: MULTI, value: { url: urlString, fileName: file.name } });
     },
     [dispatchLocalMedia]
@@ -35,19 +35,18 @@ export default function LocalMediaController() {
   useEffect(() => {
     if (localMedia.url) {
       console.log(localMedia);
-      console.log(remoteMedia);
-      if (!remoteMedia.fileName || localMedia.fileName === remoteMedia.fileName) {
-        updateInDb(db, room.name, { ...localMedia })
-          .then(() => {
-            dispatchRemoteMedia({ name: MULTI, value: { ...localMedia } });
-            console.log('Successful upload of local to remote');
-          })
-          .catch((error: any) => {
-            console.log(error);
-          });
-      } else if (remoteMedia.fileName) {
-        console.error("Files don't match!");
-      }
+      // if (!remoteMedia.fileName || localMedia.fileName === remoteMedia.fileName) {
+      //   updateInDb(db, room.name, { ...localMedia })
+      //     .then(() => {
+      //       dispatchRemoteMedia({ name: MULTI, value: { ...localMedia } });
+      //       console.log('Successful upload of local to remote');
+      //     })
+      //     .catch((error: any) => {
+      //       console.log(error);
+      //     });
+      // } else if (remoteMedia.fileName) {
+      //   console.error("Files don't match!");
+      // }
     }
   }, [localMedia.url]);
 

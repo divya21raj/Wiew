@@ -2,7 +2,7 @@ import React from 'react';
 import { act, renderHook } from '@testing-library/react-hooks';
 import { TwilioError } from 'twilio-video';
 
-import AppStateProvider, { useAppState } from './index';
+import { AppStateProvider, useAppState } from './index';
 import useFirebaseAuth from './useFirebaseAuth/useFirebaseAuth';
 import usePasscodeAuth from './usePasscodeAuth/usePasscodeAuth';
 

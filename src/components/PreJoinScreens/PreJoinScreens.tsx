@@ -34,11 +34,11 @@ export default function PreJoinScreens() {
 
   useEffect(() => {
     if (step === Steps.deviceSelectionStep) {
-      getAudioAndVideoTracks().catch(error => {
-        console.log('Error acquiring local media:');
-        console.dir(error);
-        setMediaError(error);
-      });
+      // getAudioAndVideoTracks().catch(error => {
+      //   console.log('Error acquiring local media:');
+      //   console.dir(error);
+      //   setMediaError(error);
+      // });
     }
   }, [getAudioAndVideoTracks, step]);
 
