@@ -1,15 +1,9 @@
-import { YouTube } from '@material-ui/icons';
-import FolderIcon from '@material-ui/icons/Folder';
-import LocalMediaController from '../../components/Buttons/MediaController/LocalMediaController';
-import YouTubeController from '../../components/Buttons/MediaController/YouTubeController';
 import { MediaSource } from './MediaSource';
+import { pickBy } from 'lodash';
+import { SOURCEMAP } from './mediaReducers';
+import { removeUndefineds } from '../../utils';
 
 export const MULTI = 'SET_MULTIPLE';
-
-export const SOURCEMAP = {
-  YT: new MediaSource('Youtube', YouTube, YouTubeController),
-  LOCAL: new MediaSource('Local', FolderIcon, LocalMediaController),
-};
 
 export interface Media {
   url: string;
@@ -19,7 +13,7 @@ export interface Media {
   timestamp: number;
 }
 
-export const docToMedia = (doc: any) => {
+export const mediaToDoc = (doc: any) => {
   console.log(doc);
   const media: Media = {
     url: doc.url,
@@ -29,7 +23,15 @@ export const docToMedia = (doc: any) => {
     fileName: doc.fileName,
   };
 
-  return media;
+  return removeUndefineds(media);
+};
+
+export const docToMedia = (doc: any) => {
+  if ('source' in doc) {
+    const source: string = doc.source;
+    doc = { ...doc, source: SOURCEMAP[source] };
+  }
+  return doc;
 };
 
 export function instanceOfMedia(object: any): object is Media {

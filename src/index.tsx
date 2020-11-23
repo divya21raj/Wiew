@@ -36,20 +36,18 @@ ReactDOM.render(
     <Router>
       <AppStateProvider>
         <DbStateProvider>
-          <MediaStateProvider>
-            <Switch>
-              <PrivateRoute exact path="/">
-                <VideoApp />
-              </PrivateRoute>
-              <PrivateRoute path="/room/:URLRoomName">
-                <VideoApp />
-              </PrivateRoute>
-              <Route path="/login">
-                <LoginPage />
-              </Route>
-              <Redirect to="/" />
-            </Switch>
-          </MediaStateProvider>
+          <Switch>
+            <PrivateRoute exact path="/">
+              <VideoApp />
+            </PrivateRoute>
+            <PrivateRoute path="/room/:URLRoomName">
+              <VideoApp />
+            </PrivateRoute>
+            <Route path="/login">
+              <LoginPage />
+            </Route>
+            <Redirect to="/" />
+          </Switch>
         </DbStateProvider>
       </AppStateProvider>
     </Router>

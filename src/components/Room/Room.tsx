@@ -1,7 +1,7 @@
 import { styled } from '@material-ui/core/styles';
 import React, { useEffect, useState } from 'react';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
-import { useAppState, useDbState, useMediaState } from '../../state';
+import { useDbState, useMediaState } from '../../state';
 import { docToMedia, MULTI } from '../../state/media/media';
 import { NoMediaText } from '../Dialogs/NoMediaDialog';
 import ParticipantList from '../ParticipantList/ParticipantList';

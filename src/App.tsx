@@ -9,6 +9,7 @@ import Room from './components/Room/Room';
 
 import useHeight from './hooks/useHeight/useHeight';
 import useRoomState from './hooks/useRoomState/useRoomState';
+import { MediaStateProvider } from './state';
 
 const Container = styled('div')({
   display: 'grid',
@@ -42,8 +43,10 @@ export default function App() {
         <Main>
           <ReconnectingNotification />
           <MobileTopMenuBar />
-          <Room />
-          <MenuBar />
+          <MediaStateProvider>
+            <Room />
+            <MenuBar />
+          </MediaStateProvider>
         </Main>
       )}
     </Container>

@@ -13,7 +13,7 @@ export const MediaStateContext = createContext<MediaStateContextType>(null!);
 
 export function MediaStateProvider(props: React.PropsWithChildren<{}>) {
   const [localMedia, dispatchLocalMedia] = useReducer(localMediaReducer, initialLocalMedia);
-  const { db, setInDb, getFromDb, updateInDb } = useDbState();
+  const { db, updateInDb } = useDbState();
   const { room } = useVideoContext();
 
   const [iUpdatedRemote, setIUpdatedRemote] = useState(false);
@@ -69,7 +69,7 @@ export function MediaStateProvider(props: React.PropsWithChildren<{}>) {
 export function useMediaState() {
   const context = useContext(MediaStateContext);
   if (!context) {
-    throw new Error('useAppState must be used within the AppStateProvider');
+    throw new Error('useMediaState must be used within the MediaStateProvider');
   }
   return context;
 }

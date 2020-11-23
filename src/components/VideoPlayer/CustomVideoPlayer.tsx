@@ -154,10 +154,10 @@ function CustomVideoPlayer() {
   const handlePlayPause = () => {
     setState({ ...state, playing: !state.playing });
     console.log('Is Ready to playtoggle? ' + ready);
-    if (ready) {
-      console.log('Upload in playToggle');
-      dispatchLocalMedia({ name: MULTI, value: { playing: playing, timestamp: state.playedSeconds } });
-    }
+    // if (ready) {
+    //   console.log('Upload in playToggle');
+    //   dispatchLocalMedia({ name: MULTI, value: { playing: playing, timestamp: state.playedSeconds } });
+    // }
   };
 
   const handleRewind = () => {
@@ -200,10 +200,10 @@ function CustomVideoPlayer() {
   const handleOnReady = () => {
     console.log('onReady');
     setReady(true);
-    if (state.seeking) {
-      dispatchLocalMedia({ name: 'timestamp', value: playerRef.current.getCurrentTime() });
-      console.log('Upload');
-    }
+    // if (state.seeking) {
+    //   dispatchLocalMedia({ name: 'timestamp', value: playerRef.current.getCurrentTime() });
+    //   console.log('Upload');
+    // }
   };
 
   const handleDuration = (duration: number) => {
@@ -307,6 +307,7 @@ function CustomVideoPlayer() {
           playing={playing}
           played={played}
           elapsedTime={elapsedTime}
+          duration={duration}
           totalDuration={totalDuration}
           onMute={hanldeMute}
           muted={muted}

@@ -1,7 +1,7 @@
 import { Button, Grid, IconButton, Popover, Typography } from '@material-ui/core';
 import React from 'react';
 import { useMediaState } from '../../../state';
-import { SOURCEMAP } from '../../../state/media/media';
+import { SOURCEMAP } from '../../../state/media/mediaReducers';
 
 //https://masakudamatsu.medium.com/how-to-customize-the-file-upload-button-in-react-b3866a5973d8
 

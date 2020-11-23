@@ -2,7 +2,8 @@ import { Grid, IconButton, TextField } from '@material-ui/core';
 import EjectIcon from '@material-ui/icons/Eject';
 import React, { useState } from 'react';
 import { useMediaState } from '../../../state';
-import { MULTI, SOURCEMAP } from '../../../state/media/media';
+import { MULTI } from '../../../state/media/media';
+import { SOURCEMAP } from '../../../state/media/mediaReducers';
 
 export default function YouTubeController() {
   const [value, setValue] = useState('');

@@ -1,7 +1,7 @@
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 import { useEffect, useState } from 'react';
-import { docToMedia, instanceOfMedia } from '../media/media';
+import { mediaToDoc, instanceOfMedia } from '../media/media';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -34,7 +34,7 @@ export function useFirebaseDb() {
  * @param doc body of the doc. Has to the full object, as overwrite will happen
  */
 export function setInDb(db: firebase.firestore.Firestore, docId: string, doc: any) {
-  if (instanceOfMedia(doc)) doc = docToMedia(doc);
+  if (instanceOfMedia(doc)) doc = mediaToDoc(doc);
   return db
     .collection(collection)
     .doc(docId)
@@ -49,7 +49,7 @@ export function setInDb(db: firebase.firestore.Firestore, docId: string, doc: an
  * @param doc body of the doc. Can be just a subset of the full object
  */
 export function updateInDb(db: firebase.firestore.Firestore, docId: string, doc: any) {
-  if (instanceOfMedia(doc)) doc = docToMedia(doc);
+  if (instanceOfMedia(doc)) doc = mediaToDoc(doc);
   return db
     .collection(collection)
     .doc(docId)
