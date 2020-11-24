@@ -112,10 +112,10 @@ function CustomVideoPlayer() {
   const [timeDisplayFormat, setTimeDisplayFormat] = React.useState('normal');
   const [state, setState] = useState({
     pip: false,
-    playing: true,
+    playing: false,
     controls: false,
     light: false,
-    muted: true,
+    muted: false,
     played: 0,
     duration: 0,
     playbackRate: 1.0,
@@ -131,13 +131,16 @@ function CustomVideoPlayer() {
 
   const handlePlayPause = () => {
     setState({ ...state, playing: !state.playing });
+    console.log('playing: ' + state.playing);
   };
 
   const handleRewind = () => {
+    console.log('rewind');
     playerRef.current.seekTo(playerRef.current.getCurrentTime() - 10);
   };
 
   const handleFastForward = () => {
+    console.log('fastforward');
     playerRef.current.seekTo(playerRef.current.getCurrentTime() + 10);
   };
 
@@ -146,7 +149,7 @@ function CustomVideoPlayer() {
       controlsRef.current.style.visibility = 'hidden';
       count = 0;
     }
-    if (controlsRef.current.style.visibility == 'visible') {
+    if (controlsRef.current.style.visibility === 'visible') {
       count += 1;
     }
     if (!state.seeking) {
@@ -155,15 +158,17 @@ function CustomVideoPlayer() {
   };
 
   const handleSeekChange = (e: any, newValue: any) => {
-    console.log({ newValue });
+    console.log('seekchange' + { newValue });
     setState({ ...state, played: newValue / 100 });
   };
 
   const handleSeekMouseDown = (e: any) => {
+    console.log('seekMouseDown');
     setState({ ...state, seeking: true });
   };
 
   const handleSeekMouseUp = (e: any, newValue: any) => {
+    console.log('seekMouseUp');
     console.log({ value: e.target });
     setState({ ...state, seeking: false });
     // console.log(sliderRef.current.value)
@@ -178,7 +183,6 @@ function CustomVideoPlayer() {
     setState({ ...state, seeking: false, volume: newValue / 100 });
   };
   const handleVolumeChange = (e: any, newValue: any) => {
-    // console.log(newValue);
     setState({
       ...state,
       volume: newValue / 100,
@@ -191,7 +195,6 @@ function CustomVideoPlayer() {
   };
 
   const handleMouseMove = () => {
-    console.log('mousemove');
     controlsRef.current.style.visibility = 'visible';
     count = 0;
   };
@@ -202,7 +205,7 @@ function CustomVideoPlayer() {
   };
 
   const handleDisplayFormat = () => {
-    setTimeDisplayFormat(timeDisplayFormat == 'normal' ? 'remaining' : 'normal');
+    setTimeDisplayFormat(timeDisplayFormat === 'normal' ? 'remaining' : 'normal');
   };
 
   const handlePlaybackRate = (rate: number) => {
@@ -216,7 +219,7 @@ function CustomVideoPlayer() {
   const currentTime = playerRef && playerRef.current ? playerRef.current.getCurrentTime() : '00:00';
 
   const duration = playerRef && playerRef.current ? playerRef.current.getDuration() : '00:00';
-  const elapsedTime = timeDisplayFormat == 'normal' ? format(currentTime) : `-${format(duration - currentTime)}`;
+  const elapsedTime = timeDisplayFormat === 'normal' ? format(currentTime) : `-${format(duration - currentTime)}`;
 
   const totalDuration = format(duration);
 
@@ -246,7 +249,7 @@ function CustomVideoPlayer() {
           config={{
             file: {
               attributes: {
-                crossorigin: 'anonymous',
+                crossOrigin: 'anonymous',
               },
             },
           }}
