@@ -27,7 +27,7 @@ let count = 0;
 function CustomVideoPlayer() {
   const classes = usePlayerStyles();
 
-  const { localMedia, remoteMedia, dispatchLocalMedia, dispatchRemoteMedia } = useAppState();
+  const { localMedia } = useAppState();
 
   const [showControls, setShowControls] = useState(false);
   // const [count, setCount] = useState(0);
@@ -50,21 +50,6 @@ function CustomVideoPlayer() {
   const playerContainerRef = useRef<any>(null);
   const controlsRef = useRef<any>(null);
 
-  const handlePlayPause = () => {
-    setState({ ...state, playing: !state.playing });
-    console.log('playing: ' + state.playing);
-  };
-
-  const handleRewind = () => {
-    console.log('rewind');
-    playerRef.current.seekTo(playerRef.current.getCurrentTime() - 10);
-  };
-
-  const handleFastForward = () => {
-    console.log('fastforward');
-    playerRef.current.seekTo(playerRef.current.getCurrentTime() + 10);
-  };
-
   const handleProgress = (changeState: any) => {
     if (count > 3) {
       controlsRef.current.style.visibility = 'hidden';
@@ -78,41 +63,8 @@ function CustomVideoPlayer() {
     }
   };
 
-  const handleSeekChange = (e: any, newValue: any) => {
-    console.log('seekchange' + { newValue });
-    setState({ ...state, played: newValue / 100 });
-  };
-
-  const handleSeekMouseDown = (e: any) => {
-    console.log('seekMouseDown');
-    setState({ ...state, seeking: true });
-  };
-
-  const handleSeekMouseUp = (e: any, newValue: any) => {
-    console.log('seekMouseUp');
-    console.log({ value: e.target });
-    setState({ ...state, seeking: false });
-    // console.log(sliderRef.current.value)
-    playerRef.current.seekTo(newValue / 100, 'fraction');
-  };
-
   const handleDuration = (duration: number) => {
     setState({ ...state, duration });
-  };
-
-  const handleVolumeSeekDown = (e: any, newValue: any) => {
-    setState({ ...state, seeking: false, volume: newValue / 100 });
-  };
-  const handleVolumeChange = (e: any, newValue: any) => {
-    setState({
-      ...state,
-      volume: newValue / 100,
-      muted: newValue === 0 ? true : false,
-    });
-  };
-
-  const toggleFullScreen = () => {
-    (screenful as Screenfull).toggle(playerContainerRef.current);
   };
 
   const handleMouseMove = () => {
@@ -123,18 +75,6 @@ function CustomVideoPlayer() {
   const hanldeMouseLeave = () => {
     controlsRef.current.style.visibility = 'hidden';
     count = 0;
-  };
-
-  const handleDisplayFormat = () => {
-    setTimeDisplayFormat(timeDisplayFormat === 'normal' ? 'remaining' : 'normal');
-  };
-
-  const handlePlaybackRate = (rate: number) => {
-    setState({ ...state, playbackRate: rate });
-  };
-
-  const hanldeMute = () => {
-    setState({ ...state, muted: !state.muted });
   };
 
   const currentTime = playerRef && playerRef.current ? playerRef.current.getCurrentTime() : '00:00';
@@ -179,24 +119,33 @@ function CustomVideoPlayer() {
 
         <Controls
           ref={controlsRef}
-          onSeek={handleSeekChange}
-          onSeekMouseDown={handleSeekMouseDown}
-          onSeekMouseUp={handleSeekMouseUp}
-          onRewind={handleRewind}
-          onPlayPause={handlePlayPause}
-          onFastForward={handleFastForward}
+          onSeek={(e: any, newValue: any) => setState({ ...state, played: newValue / 100 })}
+          onSeekMouseDown={() => setState({ ...state, seeking: true })}
+          onSeekMouseUp={(e: any, newValue: any) => {
+            setState({ ...state, seeking: false });
+            playerRef.current.seekTo(newValue / 100, 'fraction');
+          }}
+          onRewind={() => playerRef.current.seekTo(playerRef.current.getCurrentTime() - 10)}
+          onFastForward={() => playerRef.current.seekTo(playerRef.current.getCurrentTime() + 10)}
+          onPlayPause={() => setState({ ...state, playing: !state.playing })}
           playing={state.playing}
           played={state.played}
           elapsedTime={elapsedTime}
           totalDuration={totalDuration}
-          onMute={hanldeMute}
+          onMute={() => setState({ ...state, muted: !state.muted })}
           muted={state.muted}
-          onVolumeChange={handleVolumeChange}
-          onVolumeSeekDown={handleVolumeSeekDown}
-          onChangeDispayFormat={handleDisplayFormat}
+          onVolumeChange={(e: any, newValue: any) =>
+            setState({
+              ...state,
+              volume: newValue / 100,
+              muted: newValue === 0 ? true : false,
+            })
+          }
+          onVolumeSeekDown={(e: any, newValue: any) => setState({ ...state, seeking: false, volume: newValue / 100 })}
+          onChangeDispayFormat={() => setTimeDisplayFormat(timeDisplayFormat === 'normal' ? 'remaining' : 'normal')}
           playbackRate={state.playbackRate}
-          onPlaybackRateChange={handlePlaybackRate}
-          onToggleFullScreen={toggleFullScreen}
+          onPlaybackRateChange={(rate: number) => setState({ ...state, playbackRate: rate })}
+          onToggleFullScreen={() => (screenful as Screenfull).toggle(playerContainerRef.current)}
           volume={state.volume}
         />
       </div>
