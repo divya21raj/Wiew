@@ -1,87 +1,9 @@
-import { makeStyles } from '@material-ui/core/styles';
 import React, { useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
 import screenful, { Screenfull } from 'screenfull';
 import { useAppState } from '../../state';
 import Controls from './Controls';
-
-const useStyles = makeStyles(theme => ({
-  playerWrapper: {
-    position: 'relative',
-    paddingTop: '56.25%',
-  },
-
-  reactPlayer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-  },
-
-  controlsWrapper: {
-    visibility: 'hidden',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: 'rgba(0,0,0,0.4)',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-  },
-  topControls: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    padding: theme.spacing(2),
-  },
-  middleControls: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  bottomWrapper: {
-    display: 'flex',
-    flexDirection: 'column',
-
-    // background: "rgba(0,0,0,0.6)",
-    // height: 60,
-    padding: theme.spacing(2),
-  },
-
-  bottomControls: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    // height:40,
-  },
-
-  button: {
-    margin: theme.spacing(1),
-  },
-  controlIcons: {
-    color: '#777',
-
-    fontSize: 50,
-    transform: 'scale(0.9)',
-    '&:hover': {
-      color: '#fff',
-      transform: 'scale(1)',
-    },
-  },
-
-  bottomIcons: {
-    color: '#999',
-    '&:hover': {
-      color: '#fff',
-    },
-  },
-
-  volumeSlider: {
-    width: 100,
-  },
-}));
+import { usePlayerStyles } from './styles/videoPlayerStyles';
 
 const format = (seconds: number) => {
   if (isNaN(seconds)) {
@@ -103,7 +25,7 @@ const format = (seconds: number) => {
 let count = 0;
 
 function CustomVideoPlayer() {
-  const classes = useStyles();
+  const classes = usePlayerStyles();
 
   const { localMedia, remoteMedia, dispatchLocalMedia, dispatchRemoteMedia } = useAppState();
 
@@ -127,7 +49,6 @@ function CustomVideoPlayer() {
   const playerRef = useRef<any>(null);
   const playerContainerRef = useRef<any>(null);
   const controlsRef = useRef<any>(null);
-  const { playing = false, light, muted = false, loop, playbackRate, pip, played, seeking, volume } = state;
 
   const handlePlayPause = () => {
     setState({ ...state, playing: !state.playing });
@@ -237,15 +158,16 @@ function CustomVideoPlayer() {
           width="100%"
           height="100%"
           url={localMedia.url}
-          pip={pip}
-          playing={playing}
+          pip={state.pip}
+          playing={state.playing}
           controls={showControls}
-          light={light}
-          loop={loop}
-          playbackRate={playbackRate}
-          volume={volume}
-          muted={muted}
+          light={state.light}
+          loop={state.loop}
+          playbackRate={state.playbackRate}
+          volume={state.volume}
+          muted={state.muted}
           onProgress={handleProgress}
+          onDuration={handleDuration}
           config={{
             file: {
               attributes: {
@@ -260,23 +182,22 @@ function CustomVideoPlayer() {
           onSeek={handleSeekChange}
           onSeekMouseDown={handleSeekMouseDown}
           onSeekMouseUp={handleSeekMouseUp}
-          onDuration={handleDuration}
           onRewind={handleRewind}
           onPlayPause={handlePlayPause}
           onFastForward={handleFastForward}
-          playing={playing}
-          played={played}
+          playing={state.playing}
+          played={state.played}
           elapsedTime={elapsedTime}
           totalDuration={totalDuration}
           onMute={hanldeMute}
-          muted={muted}
+          muted={state.muted}
           onVolumeChange={handleVolumeChange}
           onVolumeSeekDown={handleVolumeSeekDown}
           onChangeDispayFormat={handleDisplayFormat}
-          playbackRate={playbackRate}
+          playbackRate={state.playbackRate}
           onPlaybackRateChange={handlePlaybackRate}
           onToggleFullScreen={toggleFullScreen}
-          volume={volume}
+          volume={state.volume}
         />
       </div>
     </>
