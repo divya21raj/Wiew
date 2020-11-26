@@ -21,9 +21,10 @@ export interface Media {
 
 export const docToMedia = (doc: any) => {
   console.log(doc);
+  const source = doc.source ? doc.source.toString() : doc.source;
   const media: Media = {
     url: doc.url,
-    source: doc.source.toString(),
+    source: source,
     playing: doc.playing,
     timestamp: doc.timestamp,
     fileName: doc.fileName,

@@ -2,10 +2,11 @@ import { styled } from '@material-ui/core/styles';
 import React, { useEffect, useState } from 'react';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 import { useAppState, useDbState } from '../../state';
-import { docToMedia, MULTI } from '../../state/media/media';
-import { NoMediaText } from '../Dialogs/NoMediaDialog';
+import { docToMedia, MULTI, SOURCEMAP } from '../../state/media/media';
+import { initialRemoteMedia } from '../../state/media/mediaReducers';
+import NoMediaDialog, { NoMediaText } from '../Dialogs/NoMediaDialog';
 import ParticipantList from '../ParticipantList/ParticipantList';
-import CustomVideoPlayer from '../VideoPlayer/CustomVideoPlayer';
+import VideoPlayer from '../VideoPlayer/VideoPlayer';
 
 const Container = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -33,28 +34,6 @@ export default function Room() {
     if (!hasInit) {
       setHasInit(true);
 
-      // Add a listener for remote media changes
-      // FIX IF DATA NOT EXISTS
-      db.collection('rooms')
-        .doc(room.name)
-        .onSnapshot(
-          function(doc) {
-            if (doc.data()) {
-              dispatchLocalMedia({
-                name: MULTI,
-                value: { playing: doc.data()!.playing, timestamp: doc.data()!.timestamp },
-              });
-
-              if (!doc.data()!.url)
-                // data reset, reset the remote media too
-                dispatchRemoteMedia({ name: MULTI, value: { ...docToMedia(doc.data()) } });
-            }
-          },
-          function(error) {
-            console.log(error.message);
-          }
-        );
-
       getFromDb(db, room.name)
         .then((doc: any) => {
           if (doc.exists) {
@@ -62,7 +41,7 @@ export default function Room() {
             dispatchRemoteMedia({ name: MULTI, value: { ...docToMedia(doc.data()) } });
           } else {
             // No one in the room, init it
-            setInDb(db, room.name, { ...remoteMedia })
+            setInDb(db, room.name, { ...initialRemoteMedia })
               .then(function() {
                 console.log('inited empty room');
               })
@@ -76,27 +55,50 @@ export default function Room() {
           console.error('Error writing document: ', error);
           setHasInit(false);
         });
+
+      // Add a listener for remote media changes
+      db.collection('rooms')
+        .doc(room.name)
+        .onSnapshot(
+          function(doc) {
+            if (doc.data()) {
+              dispatchLocalMedia({
+                name: MULTI,
+                value: { playing: doc.data()!.playing, timestamp: doc.data()!.timestamp },
+              });
+
+              if (!doc.data()!.url)
+                // data reset, reset the remote media too
+                dispatchRemoteMedia({ name: MULTI, value: { ...docToMedia(doc.data()) } });
+            } else console.log('NO DATA');
+          },
+          function(error) {
+            console.log(error.message);
+          }
+        );
     }
 
     console.log(localMedia);
     console.log(remoteMedia);
 
-    if (!(localMedia.fileName && remoteMedia.fileName)) {
-      // nothing loaded, prompt user to load something
-      setDialogMessage(NoMediaText.NO_FILE);
-      setShowDialog(true);
-    } else if (localMedia.fileName !== remoteMedia.fileName) {
-      // fileName mismatch, prompt to load new file
-      setDialogMessage(NoMediaText.NO_MATCH);
-      setShowDialog(true);
-    } else setShowDialog(false);
+    if (localMedia.source === SOURCEMAP.LOCAL) {
+      if (!(localMedia.fileName && remoteMedia.fileName)) {
+        // nothing loaded, prompt user to load something
+        setDialogMessage(NoMediaText.NO_FILE);
+        setShowDialog(true);
+      } else if (localMedia.fileName !== remoteMedia.fileName) {
+        // fileName mismatch, prompt to load new file
+        setDialogMessage(NoMediaText.NO_MATCH);
+        setShowDialog(true);
+      } else setShowDialog(false);
+    }
   }, [remoteMedia, localMedia.fileName]);
 
   return (
     <Container>
-      <CustomVideoPlayer />
+      <VideoPlayer />
       <ParticipantList />
-      {/* {showDialog && <NoMediaDialog text={dialogMessage} />} */}
+      {showDialog && <NoMediaDialog text={dialogMessage} />}
     </Container>
   );
 }

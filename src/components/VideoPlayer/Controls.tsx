@@ -92,9 +92,9 @@ const Controls = forwardRef<HTMLDivElement, ControlsProps>((controlProps, ref) =
             <PrettoSlider
               min={0}
               max={100}
-              ValueLabelComponent={props => <ValueLabelComponent {...props} value={controlProps.elapsedTime} />}
+              // ValueLabelComponent={props => <ValueLabelComponent {...props} value={controlProps.elapsedTime} />}
               aria-label="custom thumb label"
-              value={controlProps.played * 100}
+              value={controlProps.played}
               onChange={controlProps.onSeek}
               onMouseDown={controlProps.onSeekMouseDown}
               onChangeCommitted={controlProps.onSeekMouseUp}

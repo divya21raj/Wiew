@@ -61,30 +61,4 @@ export default function MediaController(props: { className?: string }) {
       {<localMedia.source.controller />}
     </>
   );
-
-  // return (
-  //   <>
-  //     <UploadFileButton />
-  //     <ResetMediaButton />
-  //     <Grid style={{ flex: 1, padding: '10px' }}>
-  //       <Typography variant="body1">{fileName === '' ? 'No file loaded' : fileName}</Typography>
-  //     </Grid>
-  //   </>
-  // );
-
-  // return (
-  //   <>
-  //     <Button variant="contained" color="primary" onClick={handleClick}>
-  //       Choose Media
-  //     </Button>
-  //     <input
-  //       type="file"
-  //       name="video"
-  //       multiple={false}
-  //       ref={hiddenFileInput}
-  //       onChange={handleChange}
-  //       style={{ display: 'none' }}
-  //     />
-  //   </>
-  // );
 }

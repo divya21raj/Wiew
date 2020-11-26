@@ -7,15 +7,15 @@ export interface MediaAction {
 
 export const initialRemoteMedia: Media = {
   url: '',
-  source: SOURCEMAP.YT,
+  source: SOURCEMAP.LOCAL,
   playing: false,
   timestamp: 0,
   fileName: '',
 };
 
 export const initialLocalMedia: Media = {
-  url: 'https://www.youtube.com/watch?v=br0NW9ufUUw',
-  source: SOURCEMAP.YT,
+  url: '',
+  source: SOURCEMAP.LOCAL,
   playing: false,
   timestamp: 0,
   fileName: '',
