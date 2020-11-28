@@ -29,6 +29,23 @@ function ValueLabelComponent(props: any) {
   );
 }
 
+const format = (seconds: number) => {
+  if (isNaN(seconds)) {
+    return `00:00`;
+  }
+  const date = new Date(seconds * 1000);
+  const hh = date.getUTCHours();
+  const mm = date.getUTCMinutes();
+  const ss = date
+    .getUTCSeconds()
+    .toString()
+    .padStart(2, '0');
+  if (hh) {
+    return `${hh}:${mm.toString().padStart(2, '0')}:${ss}`;
+  }
+  return `${mm}:${ss}`;
+};
+
 interface ControlsProps {
   onSeek: (e: any, newValue: any) => void;
   onSeekMouseDown: (e: any) => void;
@@ -44,8 +61,7 @@ interface ControlsProps {
   onVolumeChange: (e: any, newValue: any) => void;
   playing: boolean;
   played: number;
-  elapsedTime: string;
-  totalDuration: string;
+  duration: number;
   muted: boolean;
   playbackRate: number;
   volume: number;
@@ -70,9 +86,7 @@ const Controls = forwardRef<HTMLDivElement, ControlsProps>((controlProps, ref) =
       <Grid container direction="column" justify="space-between" style={{ flexGrow: 1 }}>
         <Grid container direction="row" alignItems="center" justify="space-between" style={{ padding: 16 }}>
           <Grid item>
-            <Typography variant="h5" style={{ color: '#fff' }}>
-              Video Title
-            </Typography>
+            <Typography variant="h5" style={{ color: '#fff' }}></Typography>
           </Grid>
         </Grid>
         <Grid container direction="row" alignItems="center" justify="center">
@@ -91,7 +105,7 @@ const Controls = forwardRef<HTMLDivElement, ControlsProps>((controlProps, ref) =
           <Grid item xs={12}>
             <PrettoSlider
               min={0}
-              max={100}
+              max={controlProps.duration}
               // ValueLabelComponent={props => <ValueLabelComponent {...props} value={controlProps.elapsedTime} />}
               aria-label="custom thumb label"
               value={controlProps.played}
@@ -144,7 +158,7 @@ const Controls = forwardRef<HTMLDivElement, ControlsProps>((controlProps, ref) =
                 }
               >
                 <Typography variant="body1" style={{ color: '#fff', marginLeft: 16 }}>
-                  {controlProps.elapsedTime}/{controlProps.totalDuration}
+                  {format(controlProps.played)}/{format(controlProps.duration)}
                 </Typography>
               </Button>
             </Grid>

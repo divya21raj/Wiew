@@ -6,9 +6,9 @@ import { MediaSource } from './MediaSource';
 
 export const MULTI = 'SET_MULTIPLE';
 
-export const SOURCEMAP = {
-  YT: new MediaSource('Youtube', YouTube, YouTubeController),
-  LOCAL: new MediaSource('Local', FolderIcon, LocalMediaController),
+export const SOURCEMAP: { [id: string]: MediaSource } = {
+  YT: new MediaSource('YT', YouTube, YouTubeController),
+  LOCAL: new MediaSource('LOCAL', FolderIcon, LocalMediaController),
 };
 
 export interface Media {
@@ -20,14 +20,20 @@ export interface Media {
 }
 
 export const docToMedia = (doc: any) => {
-  console.log(doc);
-  const source = doc.source ? doc.source.toString() : doc.source;
+  if ('source' in doc) {
+    const source: string = doc.source;
+    doc = { ...doc, source: SOURCEMAP[source] };
+  }
+  return doc;
+};
+
+export const mediaToDoc = (doc: any) => {
   const media: Media = {
-    url: doc.url,
-    source: source,
-    playing: doc.playing,
-    timestamp: doc.timestamp,
-    fileName: doc.fileName,
+    url: doc.url ? doc.url : '',
+    source: doc.source ? doc.source.toString() : SOURCEMAP.LOCAL.toString(),
+    playing: doc.playing ? doc.playing : false,
+    timestamp: doc.timestamp ? doc.timestamp : 0,
+    fileName: doc.fileName ? doc.fileName : '',
   };
 
   return media;

@@ -34,12 +34,11 @@ export default function LocalMediaController() {
 
   useEffect(() => {
     if (localMedia.url) {
-      console.log(localMedia);
-      console.log(remoteMedia);
+      console.log('remote fileName = ' + remoteMedia.fileName + ' and local fileName = ' + localMedia.fileName);
       if (!remoteMedia.fileName || localMedia.fileName === remoteMedia.fileName) {
-        updateInDb(db, room.name, { ...localMedia })
+        updateInDb(db, room.name, { ...localMedia, url: '' })
           .then(() => {
-            dispatchRemoteMedia({ name: MULTI, value: { ...localMedia } });
+            dispatchRemoteMedia({ name: MULTI, value: { ...localMedia, url: '' } });
             console.log('Successful upload of local to remote');
           })
           .catch((error: any) => {

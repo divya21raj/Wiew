@@ -5,21 +5,15 @@ export interface MediaAction {
   value: any;
 }
 
-export const initialRemoteMedia: Media = {
-  url: '',
-  source: SOURCEMAP.LOCAL,
+export const initialLocalMedia: Media = {
+  url: 'https://www.youtube.com/watch?v=iDZLRnHoYCI',
+  source: SOURCEMAP.YT,
   playing: false,
   timestamp: 0,
   fileName: '',
 };
 
-export const initialLocalMedia: Media = {
-  url: '',
-  source: SOURCEMAP.LOCAL,
-  playing: false,
-  timestamp: 0,
-  fileName: '',
-};
+export const initialRemoteMedia: Media = { ...initialLocalMedia };
 
 export function remoteMediaReducer(state: Media, action: MediaAction) {
   if (action.name === MULTI) {
