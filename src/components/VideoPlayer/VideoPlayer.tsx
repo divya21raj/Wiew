@@ -41,17 +41,26 @@ function VideoPlayer() {
   const playerContainerRef = useRef<any>(null);
   const controlsRef = useRef<any>(null);
 
+  // Listen for media resets
   useEffect(() => {
-    console.log('Media reset');
     setState(initialState);
   }, [localMedia.url]);
 
+  // For play toggle updates from the server
   useEffect(() => {
-    updateInDb(db, room.name, { playing: remoteMedia.playing });
+    setState({ ...state, playing: localMedia.playing });
+  }, [localMedia.playing]);
+
+  // Update the playing status on the server
+  useEffect(() => {
+    console.log(remoteMedia);
+    remoteMedia.url && updateInDb(db, room.name, { playing: remoteMedia.playing });
   }, [remoteMedia.playing]);
 
+  // Update the timestamp on the server
   useEffect(() => {
-    updateInDb(db, room.name, { timestamp: remoteMedia.timestamp });
+    console.log(remoteMedia);
+    remoteMedia.url && updateInDb(db, room.name, { timestamp: remoteMedia.timestamp });
   }, [remoteMedia.timestamp]);
 
   const printState = () => {
@@ -106,32 +115,6 @@ function VideoPlayer() {
     printState();
   };
 
-  const handleSeekChange = (e: any) => {
-    setState({ ...state, seeking: true });
-  };
-
-  const handleOnStart = () => {
-    setState({ ...state, bufferring: false, playing: true });
-  };
-
-  const handleOnReady = () => {
-    setState({ ...state, bufferring: false, seeking: false });
-  };
-
-  const handleBuffer = () => {
-    setState({ ...state, bufferring: true });
-  };
-
-  const handleEnded = () => {
-    console.log('onEnded');
-  };
-
-  const handleDuration = (duration: number) => {
-    console.log('duration=' + duration);
-    setState({ ...state, duration });
-    printState();
-  };
-
   const handleMouseMove = () => {
     if (showCustomControls) {
       controlsRef.current.style.visibility = 'visible';
@@ -167,16 +150,16 @@ function VideoPlayer() {
           playbackRate={state.playbackRate}
           volume={state.volume}
           muted={state.muted}
-          onReady={handleOnReady}
-          onStart={handleOnStart}
           onPlay={handlePlay}
           onPause={handlePause}
-          onBuffer={handleBuffer}
-          onSeek={handleSeekChange}
-          onEnded={handleEnded}
-          onError={e => console.log('onError', e)}
           onProgress={handleProgress}
-          onDuration={handleDuration}
+          onEnded={() => console.log('onEnded')}
+          onError={e => console.log('onError', e)}
+          onBuffer={() => setState({ ...state, bufferring: true })}
+          onSeek={(e: any) => setState({ ...state, seeking: true })}
+          onDuration={(duration: number) => setState({ ...state, duration })}
+          onReady={() => setState({ ...state, bufferring: false, seeking: false })}
+          onStart={() => setState({ ...state, bufferring: false, playing: true })}
           config={{
             file: {
               attributes: {
@@ -189,8 +172,14 @@ function VideoPlayer() {
         {showCustomControls && (
           <Controls
             ref={controlsRef}
-            // onSeek={(e: any, newValue: any) => setState({ ...state, playedSeconds: newValue })}
-            onSeek={(e: any, newValue: any) => {}}
+            playing={state.playing}
+            played={state.playedSeconds}
+            muted={state.muted}
+            duration={state.duration}
+            playbackRate={state.playbackRate}
+            volume={state.volume}
+            onMute={() => setState({ ...state, muted: !state.muted })}
+            onPlayPause={() => setState({ ...state, playing: !state.playing })}
             onSeekMouseDown={() => setState({ ...state, controlSeeking: true })}
             onSeekMouseUp={(e: any, newValue: any) => {
               setState({ ...state, controlSeeking: false });
@@ -198,12 +187,6 @@ function VideoPlayer() {
             }}
             onRewind={() => playerRef.current.seekTo(playerRef.current.getCurrentTime() - 10)}
             onFastForward={() => playerRef.current.seekTo(playerRef.current.getCurrentTime() + 10)}
-            onPlayPause={() => setState({ ...state, playing: !state.playing })}
-            playing={state.playing}
-            played={state.playedSeconds}
-            duration={state.duration}
-            onMute={() => setState({ ...state, muted: !state.muted })}
-            muted={state.muted}
             onVolumeChange={(e: any, newValue: any) =>
               setState({
                 ...state,
@@ -215,10 +198,8 @@ function VideoPlayer() {
               setState({ ...state, controlSeeking: false, volume: newValue / 100 })
             }
             onChangeDispayFormat={() => setTimeDisplayFormat(timeDisplayFormat === 'normal' ? 'remaining' : 'normal')}
-            playbackRate={state.playbackRate}
             onPlaybackRateChange={(rate: number) => setState({ ...state, playbackRate: rate })}
             onToggleFullScreen={() => (screenful as Screenfull).toggle(playerContainerRef.current)}
-            volume={state.volume}
           />
         )}
       </div>

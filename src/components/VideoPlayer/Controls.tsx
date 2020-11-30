@@ -47,7 +47,6 @@ const format = (seconds: number) => {
 };
 
 interface ControlsProps {
-  onSeek: (e: any, newValue: any) => void;
   onSeekMouseDown: (e: any) => void;
   onSeekMouseUp: (e: any, newValue: any) => void;
   onRewind: () => void;
@@ -109,7 +108,7 @@ const Controls = forwardRef<HTMLDivElement, ControlsProps>((controlProps, ref) =
               // ValueLabelComponent={props => <ValueLabelComponent {...props} value={controlProps.elapsedTime} />}
               aria-label="custom thumb label"
               value={controlProps.played}
-              onChange={controlProps.onSeek}
+              // onChange={controlProps.onSeek}
               onMouseDown={controlProps.onSeekMouseDown}
               onChangeCommitted={controlProps.onSeekMouseUp}
               // onDuration={controlProps.onDuration}

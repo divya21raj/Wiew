@@ -52,7 +52,11 @@ export function updateInDb(db: firebase.firestore.Firestore, docId: string, doc:
   return db
     .collection(collection)
     .doc(docId)
-    .set(doc, { merge: true });
+    .update(doc)
+    .catch(function(error) {
+      // The document probably doesn't exist.
+      console.error('Error updating document: ' + docId);
+    });
 }
 
 export function getFromDb(db: firebase.firestore.Firestore, docId: string) {
