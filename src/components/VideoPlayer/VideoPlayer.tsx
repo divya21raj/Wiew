@@ -3,7 +3,7 @@ import ReactPlayer from 'react-player';
 import screenful, { Screenfull } from 'screenfull';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 import { useAppState, useDbState } from '../../state';
-import { MULTI, SOURCEMAP } from '../../state/media/media';
+import { SOURCEMAP } from '../../state/media/media';
 import Controls from './Controls';
 import { usePlayerStyles } from './styles/videoPlayerStyles';
 
