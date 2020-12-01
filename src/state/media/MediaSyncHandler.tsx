@@ -1,13 +1,33 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppState, useDbState } from '..';
+import useMainParticipant from '../../hooks/useMainParticipant/useMainParticipant';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 import { docToMedia, MULTI } from './media';
 import { initialRemoteMedia } from './mediaReducers';
 
 export default function MediaSyncHandler(props: React.PropsWithChildren<{}>) {
-  const { db, setInDb, getFromDb } = useDbState();
-  const { dispatchRemoteMedia, dispatchLocalMedia } = useAppState();
+  const { db, updateInDb, setInDb, getFromDb } = useDbState();
+  const { remoteMedia, dispatchRemoteMedia, dispatchLocalMedia } = useAppState();
   const { room } = useVideoContext();
+  const localParticipant = useMainParticipant();
+
+  const isMe = (username: String): boolean => {
+    return localParticipant.identity.toString() === username;
+  };
+
+  const updateOnServer = (payload: any) => {
+    updateInDb(db, room.name, { ...payload, lastUpdatedBy: localParticipant.identity.toString() });
+  };
+
+  // Update the playing status on the server
+  useEffect(() => {
+    updateOnServer({ playing: remoteMedia.playing });
+  }, [remoteMedia.playing]);
+
+  // Update the timestamp on the server
+  useEffect(() => {
+    updateOnServer({ timestamp: remoteMedia.timestamp });
+  }, [remoteMedia.timestamp]);
 
   /**
    * Adds a listener to the room document
@@ -19,13 +39,14 @@ export default function MediaSyncHandler(props: React.PropsWithChildren<{}>) {
       .onSnapshot(
         function(doc) {
           if (doc.data()) {
-            console.log('Got enriched snapshot, matching localMedia with this');
-            console.log(doc.data());
-            dispatchLocalMedia({
-              name: MULTI,
-              value: { playing: doc.data()!.playing, timestamp: doc.data()!.timestamp },
-            });
-
+            if (!isMe(doc.data()!.lastUpdatedBy)) {
+              console.log('Got enriched snapshot, matching localMedia with this');
+              console.log(doc.data());
+              dispatchLocalMedia({
+                name: MULTI,
+                value: { playing: doc.data()!.playing, timestamp: doc.data()!.timestamp },
+              });
+            } else console.log('Was me yo');
             if (doc.data()!.source && doc.data()!.url) {
               // Source or url have changed
               dispatchLocalMedia({ name: MULTI, value: { ...docToMedia(doc.data()) } });
@@ -43,7 +64,7 @@ export default function MediaSyncHandler(props: React.PropsWithChildren<{}>) {
   };
 
   /**
-   * Init an empty room or join the preexisting room on startup. Add the listener in both cases.
+   * Init an empty room or join the pre-existing room on startup. Add the listener in both cases.
    * In cleanup, unsubscribe the listener.
    */
   useEffect(() => {
@@ -77,11 +98,9 @@ export default function MediaSyncHandler(props: React.PropsWithChildren<{}>) {
       });
 
     return function cleanup() {
-      unsubscribeListener();
+      if (unsubscribeListener) unsubscribeListener();
     };
   }, []);
-
-  useEffect(() => {}, []);
 
   return <>{props.children}</>;
 }

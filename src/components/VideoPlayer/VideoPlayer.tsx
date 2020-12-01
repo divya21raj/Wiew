@@ -3,7 +3,7 @@ import ReactPlayer from 'react-player';
 import screenful, { Screenfull } from 'screenfull';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 import { useAppState, useDbState } from '../../state';
-import { SOURCEMAP } from '../../state/media/media';
+import { MULTI, SOURCEMAP } from '../../state/media/media';
 import Controls from './Controls';
 import { usePlayerStyles } from './styles/videoPlayerStyles';
 
@@ -12,11 +12,8 @@ let count = 0;
 function VideoPlayer() {
   const classes = usePlayerStyles();
 
-  const { localMedia, remoteMedia, dispatchLocalMedia, dispatchRemoteMedia } = useAppState();
+  const { localMedia, dispatchRemoteMedia } = useAppState();
 
-  const [iUpdatedRemote, setIUpdatedRemote] = useState(false);
-  const { db, updateInDb } = useDbState();
-  const { room } = useVideoContext();
   const showCustomControls: Boolean = localMedia.source === SOURCEMAP.LOCAL;
   // const [count, setCount] = useState(0);
   const [timeDisplayFormat, setTimeDisplayFormat] = React.useState('normal');
@@ -36,6 +33,7 @@ function VideoPlayer() {
     bufferring: false,
   };
   const [state, setState] = useState(initialState);
+  const [iWasUpdatedByRemote, setIWasUpdatedByRemote] = useState(false);
 
   const playerRef = useRef<any>(null);
   const playerContainerRef = useRef<any>(null);
@@ -51,17 +49,15 @@ function VideoPlayer() {
     setState({ ...state, playing: localMedia.playing });
   }, [localMedia.playing]);
 
-  // Update the playing status on the server
+  // For timestamp updates from the server
   useEffect(() => {
-    console.log(remoteMedia);
-    remoteMedia.url && updateInDb(db, room.name, { playing: remoteMedia.playing });
-  }, [remoteMedia.playing]);
-
-  // Update the timestamp on the server
-  useEffect(() => {
-    console.log(remoteMedia);
-    remoteMedia.url && updateInDb(db, room.name, { timestamp: remoteMedia.timestamp });
-  }, [remoteMedia.timestamp]);
+    try {
+      playerRef.current.seekTo(localMedia.timestamp);
+      setIWasUpdatedByRemote(true);
+    } catch (error) {
+      console.warn('Player not inited yet?');
+    }
+  }, [localMedia.timestamp]);
 
   const printState = () => {
     console.log({
@@ -85,10 +81,14 @@ function VideoPlayer() {
       }
     }
     const timeDiff = Math.abs(state.playedSeconds - changeState.playedSeconds);
-    if (timeDiff > 1.6) {
-      console.log(timeDiff);
-      dispatchRemoteMedia({ name: 'timestamp', value: changeState.playedSeconds });
+    if (timeDiff > 2) {
+      console.log('I was updated by remote = ' + iWasUpdatedByRemote);
+      if (!iWasUpdatedByRemote) {
+        console.log(timeDiff);
+        dispatchRemoteMedia({ name: 'timestamp', value: changeState.playedSeconds });
+      }
     }
+    setIWasUpdatedByRemote(false);
     setState({ ...state, playedSeconds: changeState.playedSeconds });
   };
 
@@ -96,13 +96,16 @@ function VideoPlayer() {
     console.log('Play toggle');
     printState();
     dispatchRemoteMedia({ name: 'playing', value: playing });
+    // dispatchRemoteMedia({
+    //   name: MULTI,
+    //   value: { playing: playing, timestamp: state.playedSeconds },
+    // });
   };
 
   const handlePlay = () => {
     console.log('onPlay');
     setState({ ...state, bufferring: false, playing: true });
     handlePlayToggle(true);
-    printState();
   };
 
   const handlePause = () => {
@@ -112,7 +115,6 @@ function VideoPlayer() {
       //Was actually paused and not seeked
       handlePlayToggle(false);
     }
-    printState();
   };
 
   const handleMouseMove = () => {

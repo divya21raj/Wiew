@@ -41,7 +41,6 @@ export interface DbContextContextType {
   setInDb: any;
   updateInDb: any;
   getFromDb: any;
-  listenInDb: any;
 }
 
 export const StateContext = createContext<AppStateContextType>(null!);
