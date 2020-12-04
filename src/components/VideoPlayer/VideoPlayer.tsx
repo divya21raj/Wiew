@@ -9,6 +9,7 @@ import { usePlayerStyles } from './styles/videoPlayerStyles';
 var count = 0;
 var lockPlayingUpload: Boolean = false;
 var lockTimestampUpload: Boolean = false;
+var firstRun: Boolean = true;
 
 function VideoPlayer() {
   const classes = usePlayerStyles();
@@ -52,10 +53,9 @@ function VideoPlayer() {
   // For timestamp updates from the server
   useEffect(() => {
     try {
-      if (localMedia.timestamp != 0) {
-        lockTimestampUpload = true;
-        lockPlayingUpload = true;
-      }
+      if (localMedia.timestamp != 0) lockTimestampUpload = true;
+      if (localMedia.playing) lockPlayingUpload = true;
+
       playerRef.current.seekTo(localMedia.timestamp);
     } catch (error) {
       console.warn('Player not inited yet?');
@@ -89,21 +89,26 @@ function VideoPlayer() {
       if (!lockTimestampUpload) {
         console.log(timeDiff);
         dispatchRemoteMedia({ name: 'timestamp', value: changeState.playedSeconds });
-      } else lockTimestampUpload = false;
+      }
+
+      lockTimestampUpload = false;
     }
     setState({ ...state, playedSeconds: changeState.playedSeconds });
   };
 
   const handlePlayToggle = (playing: Boolean) => {
     console.log('Is play upload locked = ' + lockPlayingUpload);
-    if (!lockPlayingUpload) {
+    if (!lockPlayingUpload || firstRun) {
       console.log('Play toggle upload');
       // dispatchRemoteMedia({ name: 'playing', value: playing });
+      firstRun = false;
       dispatchRemoteMedia({
         name: MULTI,
         value: { playing: playing, timestamp: state.playedSeconds },
       });
-    } else lockPlayingUpload = false;
+    }
+
+    lockPlayingUpload = false;
   };
 
   const handlePlay = () => {

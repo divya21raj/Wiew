@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppState, useDbState } from '..';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 import { docToMedia, MULTI, SOURCEMAP } from './media';
@@ -9,15 +9,17 @@ export default function MediaSyncHandler(props: React.PropsWithChildren<{}>) {
   const { remoteMedia, dispatchRemoteMedia, dispatchLocalMedia } = useAppState();
   const { room } = useVideoContext();
 
-  // console.log(remoteMedia.playing, remoteMedia.timestamp);
+  const [firstRun, setFirstRun] = useState(true);
 
   const isMe = (username: String): boolean => {
     return room.localParticipant.identity.toString() === username;
   };
 
   const updateOnServer = (payload: any) => {
-    console.log('Sending an upadate');
-    updateInDb(db, room.name, { ...payload, lastUpdatedBy: room.localParticipant.identity.toString() });
+    if (!firstRun) {
+      console.log('Sending an upadate');
+      updateInDb(db, room.name, { ...payload, lastUpdatedBy: room.localParticipant.identity.toString() });
+    } else setFirstRun(false);
   };
 
   // Update the playing status on the server
@@ -29,6 +31,12 @@ export default function MediaSyncHandler(props: React.PropsWithChildren<{}>) {
   useEffect(() => {
     updateOnServer({ timestamp: remoteMedia.timestamp });
   }, [remoteMedia.timestamp]);
+
+  // Update new media loads on server
+  useEffect(() => {
+    if (remoteMedia.source !== SOURCEMAP.LOCAL) updateOnServer({ url: remoteMedia.url, source: remoteMedia.source });
+    else updateOnServer({ url: '', fileName: remoteMedia.fileName, source: remoteMedia.source });
+  }, [remoteMedia.url, remoteMedia.source, remoteMedia.fileName]);
 
   /**
    * Adds a listener to the room document
@@ -43,10 +51,7 @@ export default function MediaSyncHandler(props: React.PropsWithChildren<{}>) {
             if (!isMe(doc.data()!.lastUpdatedBy)) {
               console.log('Got enriched snapshot, matching localMedia with this');
               console.log(doc.data());
-              dispatchLocalMedia({
-                name: MULTI,
-                value: { playing: doc.data()!.playing, timestamp: doc.data()!.timestamp },
-              });
+              dispatchLocalMedia({ name: MULTI, value: { ...docToMedia(doc.data()) } });
             } else console.log('Was me yo');
 
             // if (
@@ -58,6 +63,7 @@ export default function MediaSyncHandler(props: React.PropsWithChildren<{}>) {
             //   dispatchLocalMedia({ name: MULTI, value: { ...docToMedia(doc.data()) } });
             // }
 
+            // TODO -> Check if we only need dispatchLocalMedia here.
             if (doc.data()!.source === SOURCEMAP.LOCAL && !doc.data()!.fileName) {
               // data reset, reset the remote media too
               console.log('data reset, reset the remote media too');
@@ -81,12 +87,9 @@ export default function MediaSyncHandler(props: React.PropsWithChildren<{}>) {
     getFromDb(db, room.name)
       .then((doc: any) => {
         if (doc.exists) {
-          // someone already in room, match that data
-          dispatchRemoteMedia({ name: MULTI, value: { ...docToMedia(doc.data()) } });
-          console.log('Already have this here - ');
-          console.log(doc.data());
-
+          // Someone already in room, match that data. Matching happens while subscribing
           // Add a listener for remote media changes
+          console.log('Someone already in room');
           unsubscribeListener = subscribeForChanges();
         } else {
           // No one in the room, init it
