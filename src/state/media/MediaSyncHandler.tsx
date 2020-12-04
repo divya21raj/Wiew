@@ -1,22 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useAppState, useDbState } from '..';
-import useMainParticipant from '../../hooks/useMainParticipant/useMainParticipant';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
-import { docToMedia, MULTI } from './media';
+import { docToMedia, MULTI, SOURCEMAP } from './media';
 import { initialRemoteMedia } from './mediaReducers';
 
 export default function MediaSyncHandler(props: React.PropsWithChildren<{}>) {
   const { db, updateInDb, setInDb, getFromDb } = useDbState();
   const { remoteMedia, dispatchRemoteMedia, dispatchLocalMedia } = useAppState();
   const { room } = useVideoContext();
-  const localParticipant = useMainParticipant();
+
+  // console.log(remoteMedia.playing, remoteMedia.timestamp);
 
   const isMe = (username: String): boolean => {
-    return localParticipant.identity.toString() === username;
+    return room.localParticipant.identity.toString() === username;
   };
 
   const updateOnServer = (payload: any) => {
-    updateInDb(db, room.name, { ...payload, lastUpdatedBy: localParticipant.identity.toString() });
+    console.log('Sending an upadate');
+    updateInDb(db, room.name, { ...payload, lastUpdatedBy: room.localParticipant.identity.toString() });
   };
 
   // Update the playing status on the server
@@ -47,14 +48,21 @@ export default function MediaSyncHandler(props: React.PropsWithChildren<{}>) {
                 value: { playing: doc.data()!.playing, timestamp: doc.data()!.timestamp },
               });
             } else console.log('Was me yo');
-            if (doc.data()!.source && doc.data()!.url) {
-              // Source or url have changed
-              dispatchLocalMedia({ name: MULTI, value: { ...docToMedia(doc.data()) } });
-            }
 
-            if (!doc.data()!.url)
+            // if (
+            //   doc.data()!.source !== localMedia.source.toString() ||
+            //   (doc.data()!.url && doc.data()!.url !== localMedia.url)
+            // ) {
+            //   // Source or url have changed
+            //   console.log('Source or url have changed');
+            //   dispatchLocalMedia({ name: MULTI, value: { ...docToMedia(doc.data()) } });
+            // }
+
+            if (doc.data()!.source === SOURCEMAP.LOCAL && !doc.data()!.fileName) {
               // data reset, reset the remote media too
+              console.log('data reset, reset the remote media too');
               dispatchRemoteMedia({ name: MULTI, value: { ...docToMedia(doc.data()) } });
+            }
           } else console.log('NO DATA');
         },
         function(error) {
@@ -98,6 +106,7 @@ export default function MediaSyncHandler(props: React.PropsWithChildren<{}>) {
       });
 
     return function cleanup() {
+      console.log('Cleanup listener');
       if (unsubscribeListener) unsubscribeListener();
     };
   }, []);

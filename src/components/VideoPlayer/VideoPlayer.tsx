@@ -1,22 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
 import screenful, { Screenfull } from 'screenfull';
-import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
-import { useAppState, useDbState } from '../../state';
+import { useAppState } from '../../state';
 import { MULTI, SOURCEMAP } from '../../state/media/media';
 import Controls from './Controls';
 import { usePlayerStyles } from './styles/videoPlayerStyles';
 
-let count = 0;
+var count = 0;
+var lockPlayingUpload: Boolean = false;
+var lockTimestampUpload: Boolean = false;
 
 function VideoPlayer() {
   const classes = usePlayerStyles();
 
   const { localMedia, dispatchRemoteMedia } = useAppState();
 
-  const showCustomControls: Boolean = localMedia.source === SOURCEMAP.LOCAL;
-  // const [count, setCount] = useState(0);
-  const [timeDisplayFormat, setTimeDisplayFormat] = React.useState('normal');
+  var showCustomControls: Boolean = localMedia.source === SOURCEMAP.LOCAL;
+
   const initialState = {
     pip: false,
     playing: false,
@@ -33,7 +33,7 @@ function VideoPlayer() {
     bufferring: false,
   };
   const [state, setState] = useState(initialState);
-  const [iWasUpdatedByRemote, setIWasUpdatedByRemote] = useState(false);
+  const [timeDisplayFormat, setTimeDisplayFormat] = useState('normal');
 
   const playerRef = useRef<any>(null);
   const playerContainerRef = useRef<any>(null);
@@ -52,8 +52,11 @@ function VideoPlayer() {
   // For timestamp updates from the server
   useEffect(() => {
     try {
+      if (localMedia.timestamp != 0) {
+        lockTimestampUpload = true;
+        lockPlayingUpload = true;
+      }
       playerRef.current.seekTo(localMedia.timestamp);
-      setIWasUpdatedByRemote(true);
     } catch (error) {
       console.warn('Player not inited yet?');
     }
@@ -82,24 +85,25 @@ function VideoPlayer() {
     }
     const timeDiff = Math.abs(state.playedSeconds - changeState.playedSeconds);
     if (timeDiff > 2) {
-      console.log('I was updated by remote = ' + iWasUpdatedByRemote);
-      if (!iWasUpdatedByRemote) {
+      console.log('Is timestamp upload locked = ' + lockTimestampUpload);
+      if (!lockTimestampUpload) {
         console.log(timeDiff);
         dispatchRemoteMedia({ name: 'timestamp', value: changeState.playedSeconds });
-      }
+      } else lockTimestampUpload = false;
     }
-    setIWasUpdatedByRemote(false);
     setState({ ...state, playedSeconds: changeState.playedSeconds });
   };
 
   const handlePlayToggle = (playing: Boolean) => {
-    console.log('Play toggle');
-    printState();
-    dispatchRemoteMedia({ name: 'playing', value: playing });
-    // dispatchRemoteMedia({
-    //   name: MULTI,
-    //   value: { playing: playing, timestamp: state.playedSeconds },
-    // });
+    console.log('Is play upload locked = ' + lockPlayingUpload);
+    if (!lockPlayingUpload) {
+      console.log('Play toggle upload');
+      // dispatchRemoteMedia({ name: 'playing', value: playing });
+      dispatchRemoteMedia({
+        name: MULTI,
+        value: { playing: playing, timestamp: state.playedSeconds },
+      });
+    } else lockPlayingUpload = false;
   };
 
   const handlePlay = () => {
