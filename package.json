@@ -71,6 +71,7 @@
     "start": "concurrently npm:server npm:dev",
     "dev": "react-scripts start",
     "build": "node ./scripts/build.js",
+    "heroku-postbuild": "react-scripts build",
     "test": "jest",
     "eject": "react-scripts eject",
     "lint": "eslint src/**/*.{ts,tsx}",
