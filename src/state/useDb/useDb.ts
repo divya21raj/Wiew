@@ -18,6 +18,7 @@ export function useFirebaseDb() {
   const [db, setDb] = useState<firebase.firestore.Firestore | null>(null);
 
   useEffect(() => {
+    console.log(process.env);
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     setDb(db);
