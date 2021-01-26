@@ -67,6 +67,7 @@
       "git add"
     ]
   },
+  "homepage": ".",
   "scripts": {
     "start": "concurrently npm:server npm:dev",
     "dev": "react-scripts start",
